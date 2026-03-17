@@ -6,7 +6,6 @@ version: 2
 before:
   hooks:
     - go mod tidy
-    - go generate ./...
 
 builds:
   - id: terminalizcrazy
@@ -42,7 +41,6 @@ archives:
       - README.md
       - LICENSE
       - config.toml.example
-      - docs/**/*
 
 checksum:
   name_template: 'checksums.txt'
@@ -67,39 +65,3 @@ release:
   draft: false
   prerelease: auto
   name_template: "v{{.Version}}"
-
-brews:
-  - name: terminalizcrazy
-    repository:
-      owner: ikarusXPS
-      name: homebrew-tap
-    folder: Formula
-    homepage: "https://github.com/ikarusXPS/terminalizcrazy"
-    description: "AI-native terminal with real-time collaboration, Agent Mode, and SecretGuard"
-    license: "MIT"
-    install: |
-      bin.install "terminalizcrazy"
-    test: |
-      system "#{bin}/terminalizcrazy", "--version"
-
-scoops:
-  - name: terminalizcrazy
-    repository:
-      owner: ikarusXPS
-      name: scoop-bucket
-    homepage: "https://github.com/ikarusXPS/terminalizcrazy"
-    description: "AI-native terminal with real-time collaboration, Agent Mode, and SecretGuard"
-    license: "MIT"
-
-nfpms:
-  - id: packages
-    package_name: terminalizcrazy
-    vendor: TerminalizCrazy
-    homepage: "https://github.com/ikarusXPS/terminalizcrazy"
-    maintainer: "TerminalizCrazy Contributors"
-    description: "AI-native terminal with real-time collaboration, Agent Mode, and SecretGuard"
-    license: MIT
-    formats:
-      - deb
-      - rpm
-    bindir: /usr/bin
