@@ -1,0 +1,105 @@
+# GoReleaser configuration
+# https://goreleaser.com
+
+version: 2
+
+before:
+  hooks:
+    - go mod tidy
+    - go generate ./...
+
+builds:
+  - id: terminalizcrazy
+    main: ./cmd/terminalizcrazy
+    binary: terminalizcrazy
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - windows
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w
+      - -X main.version={{.Version}}
+      - -X main.commit={{.Commit}}
+      - -X main.date={{.Date}}
+
+archives:
+  - id: default
+    format: tar.gz
+    name_template: >-
+      {{ .ProjectName }}_
+      {{- .Version }}_
+      {{- .Os }}_
+      {{- .Arch }}
+    format_overrides:
+      - goos: windows
+        format: zip
+    files:
+      - README.md
+      - LICENSE
+      - config.toml.example
+      - docs/**/*
+
+checksum:
+  name_template: 'checksums.txt'
+
+snapshot:
+  version_template: "{{ incpatch .Version }}-next"
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+      - '^chore:'
+      - Merge pull request
+      - Merge branch
+
+release:
+  github:
+    owner: ikarusXPS
+    name: terminalizcrazy
+  draft: false
+  prerelease: auto
+  name_template: "v{{.Version}}"
+
+brews:
+  - name: terminalizcrazy
+    repository:
+      owner: ikarusXPS
+      name: homebrew-tap
+    folder: Formula
+    homepage: "https://github.com/ikarusXPS/terminalizcrazy"
+    description: "AI-native terminal with real-time collaboration, Agent Mode, and SecretGuard"
+    license: "MIT"
+    install: |
+      bin.install "terminalizcrazy"
+    test: |
+      system "#{bin}/terminalizcrazy", "--version"
+
+scoops:
+  - name: terminalizcrazy
+    repository:
+      owner: ikarusXPS
+      name: scoop-bucket
+    homepage: "https://github.com/ikarusXPS/terminalizcrazy"
+    description: "AI-native terminal with real-time collaboration, Agent Mode, and SecretGuard"
+    license: "MIT"
+
+nfpms:
+  - id: packages
+    package_name: terminalizcrazy
+    vendor: TerminalizCrazy
+    homepage: "https://github.com/ikarusXPS/terminalizcrazy"
+    maintainer: "TerminalizCrazy Contributors"
+    description: "AI-native terminal with real-time collaboration, Agent Mode, and SecretGuard"
+    license: MIT
+    formats:
+      - deb
+      - rpm
+    bindir: /usr/bin

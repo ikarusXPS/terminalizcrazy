@@ -1,305 +1,332 @@
-# ⚡ TerminalizCrazy
+# TerminalizCrazy
 
-Ein modernes, AI-natives Terminal-Tool mit eingebauter Collaboration, intelligentem Secret-Schutz und Smart Sessions.
+**AI-native terminal with real-time collaboration, Agent Mode, and SecretGuard**
+
+[![CI](https://github.com/ikarusXPS/terminalizcrazy/actions/workflows/ci.yml/badge.svg)](https://github.com/ikarusXPS/terminalizcrazy/actions/workflows/ci.yml)
+[![Go Report Card](https://goreportcard.com/badge/github.com/ikarusXPS/terminalizcrazy)](https://goreportcard.com/report/github.com/ikarusXPS/terminalizcrazy)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+TerminalizCrazy is a modern, feature-complete AI terminal built with Go and the Charm.sh ecosystem. It combines powerful AI capabilities with real-time collaboration, making terminal work more productive and collaborative.
 
 ## Features
 
-- **AI-Integration** - Natürliche Sprache → Befehle, Fehler-Erklärungen, Smart Autocomplete
-- **Command Execution** - Vorgeschlagene Befehle direkt ausführen mit Sicherheitsabfrage
-- **History Persistence** - Command-History mit SQLite, überlebt Neustarts
-- **SecretGuard** - Automatische Erkennung und Maskierung von API-Keys, Tokens, Passwörtern
-- **Risk Assessment** - Automatische Risikobewertung von Befehlen (Low/Medium/High/Critical)
-- **Session Management** - Automatische Session-Erstellung, Chat-Persistenz und Session-Wiederherstellung
-- **Smart Sessions** - Automatische Projekt-Erkennung (Go, Node, Python, Rust, etc.) mit Framework-Detection
-- **Clipboard Integration** - Befehle mit Ctrl+Y in Clipboard kopieren
-- **Real-Time Collaboration** - Terminal-Sharing wie Google Docs mit WebSocket
+### AI Integration
+- **Multi-Provider Support** - Claude (Anthropic), GPT (OpenAI), and Ollama (local)
+- **Natural Language Commands** - Describe what you want, get the right command
+- **Error Explanation** - AI explains errors and suggests fixes
+- **Project-Aware Context** - Recognizes 11 project types with framework detection
 
-## Voraussetzungen
+### Agent Mode
+- **Autonomous Task Execution** - Multi-step plans with verification
+- **Three Modes** - `off`, `suggest` (recommended), `auto`
+- **Risk-Aware** - Confirms before risky operations
+- **Plan Persistence** - Plans saved to SQLite for review
 
-- **Go 1.21+** (getestet mit Go 1.26.1)
-- **Git**
-- API-Key von [Anthropic](https://console.anthropic.com/) oder [OpenAI](https://platform.openai.com/)
+### Real-Time Collaboration
+- **Session Sharing** - Share terminal sessions like Google Docs
+- **E2E Encryption** - ECDH key exchange + AES-256-GCM
+- **User Presence** - See who's connected with typing indicators
+- **Share Codes** - Simple `xxxx-yyyy` format for joining
+
+### Tabs, Splits & Workspaces
+- **Multi-Pane Layout** - Horizontal and vertical splits
+- **Floating Panes** - Zellij-style floating windows
+- **5 Layout Presets** - quad, tall, wide, stack, single
+- **Workspace Persistence** - Layouts saved and restored
+
+### Security
+- **SecretGuard** - Auto-masks 7 secret types (AWS, GitHub, JWT, etc.)
+- **Risk Assessment** - 4 levels (Low/Medium/High/Critical)
+- **Confirmation Prompts** - Required for dangerous commands
+
+### Customization
+- **Theme System** - 5 built-in themes, custom YAML themes
+- **Hot Reload** - Theme changes apply instantly
+- **Plugin System** - 8 hook types, 4 built-in plugins
+- **Workflow Templates** - 6 built-in, create your own
+
+---
 
 ## Installation
 
-### Aus Source bauen
+### From Release (Recommended)
+
+Download the latest release for your platform:
 
 ```bash
-# Repository klonen
-git clone https://github.com/terminalizcrazy/terminalizcrazy.git
+# macOS (Intel)
+curl -L https://github.com/ikarusXPS/terminalizcrazy/releases/latest/download/terminalizcrazy_darwin_amd64.tar.gz | tar xz
+
+# macOS (Apple Silicon)
+curl -L https://github.com/ikarusXPS/terminalizcrazy/releases/latest/download/terminalizcrazy_darwin_arm64.tar.gz | tar xz
+
+# Linux
+curl -L https://github.com/ikarusXPS/terminalizcrazy/releases/latest/download/terminalizcrazy_linux_amd64.tar.gz | tar xz
+
+# Windows (PowerShell)
+Invoke-WebRequest -Uri https://github.com/ikarusXPS/terminalizcrazy/releases/latest/download/terminalizcrazy_windows_amd64.zip -OutFile terminalizcrazy.zip
+Expand-Archive terminalizcrazy.zip
+```
+
+### Homebrew (macOS/Linux)
+
+```bash
+brew tap ikarusXPS/tap
+brew install terminalizcrazy
+```
+
+### Scoop (Windows)
+
+```bash
+scoop bucket add terminalizcrazy https://github.com/ikarusXPS/scoop-bucket
+scoop install terminalizcrazy
+```
+
+### From Source
+
+```bash
+git clone https://github.com/ikarusXPS/terminalizcrazy.git
 cd terminalizcrazy
-
-# Dependencies installieren
-go mod tidy
-
-# Bauen
-go build -o bin/terminalizcrazy ./cmd/terminalizcrazy
-
-# Oder mit Make
 make build
-```
-
-### Mit Go Install
-
-```bash
-go install github.com/terminalizcrazy/terminalizcrazy/cmd/terminalizcrazy@latest
-```
-
-## Setup
-
-### 1. Umgebungsvariablen setzen
-
-```bash
-# .env Datei erstellen (aus Vorlage)
-cp .env.example .env
-
-# API-Key eintragen
-# Öffne .env und setze ANTHROPIC_API_KEY oder OPENAI_API_KEY
-```
-
-**Windows (PowerShell):**
-```powershell
-$env:ANTHROPIC_API_KEY = "sk-ant-api03-your-key-here"
-```
-
-**Linux/macOS:**
-```bash
-export ANTHROPIC_API_KEY="sk-ant-api03-your-key-here"
-```
-
-### 2. Konfiguration (optional)
-
-```bash
-# Config-Verzeichnis erstellen
-mkdir -p ~/.terminalizcrazy
-
-# Konfiguration kopieren
-cp config.toml.example ~/.terminalizcrazy/config.toml
-
-# Nach Wunsch anpassen
-```
-
-## Verwendung
-
-### Starten
-
-```bash
-# Direkt ausführen
 ./bin/terminalizcrazy
-
-# Oder mit Go
-go run ./cmd/terminalizcrazy
-
-# Oder mit Make
-make run
 ```
 
-### Tastenkürzel
+### Go Install
 
-| Taste | Aktion |
-|-------|--------|
-| `Enter` | Nachricht an AI senden |
-| `Ctrl+E` | Letzten Befehl ausführen |
-| `Ctrl+Y` | Letzten Befehl in Clipboard kopieren |
-| `Ctrl+R` | Letzten Befehl anzeigen |
-| `Ctrl+L` | Chat leeren |
-| `Ctrl+S` | Session teilen (Share) |
-| `Ctrl+J` | Collaboration beitreten (Join) |
-| `Ctrl+D` | Collaboration beenden (Disconnect) |
-| `↑` / `↓` | History durchsuchen |
-| `Y` / `N` | Bestätigung bei gefährlichen Befehlen |
-| `Esc` | Abbrechen / Beenden |
-| `Ctrl+C` | Sofort beenden |
-
-### Workflow
-
-1. **Session wählen**: Beim Start vorherige Session fortsetzen oder neu starten
-2. **Frage stellen**: "how to find large files"
-3. **AI antwortet** mit Befehl: `find . -size +100M`
-4. **Ausführen**: `Ctrl+E` drücken
-5. **Bestätigen**: Bei Medium/High Risk mit `Y` bestätigen
-6. **Output sehen**: Ergebnis wird im Chat angezeigt
-
-### Session-Wiederherstellung
-
-Beim Start zeigt TerminalizCrazy eine Liste der letzten 10 Sessions:
-
-```
-Select Session:
-
-▶ New Session
-  abc123 • Session abc123 • 2 hours ago
-  def456 • Session def456 • yesterday
+```bash
+go install github.com/ikarusXPS/terminalizcrazy/cmd/terminalizcrazy@latest
 ```
 
-- **↑↓**: Session auswählen
-- **Enter**: Ausgewählte Session laden
-- **N** oder **Esc**: Neue Session starten
+---
 
-Alle Chat-Nachrichten und der letzte Befehl werden wiederhergestellt.
+## Quick Start
 
-### Smart Sessions
+### 1. Set API Key
 
-TerminalizCrazy erkennt automatisch den Projekttyp anhand von Konfigurationsdateien:
+```bash
+# Anthropic (Claude)
+export ANTHROPIC_API_KEY="sk-ant-api03-..."
 
-| Datei | Erkannter Typ | Icon |
-|-------|---------------|------|
+# OR OpenAI
+export OPENAI_API_KEY="sk-..."
+
+# OR Ollama (local, no key needed)
+export OLLAMA_ENABLED=true
+export OLLAMA_MODEL=codellama
+```
+
+### 2. Run
+
+```bash
+terminalizcrazy
+```
+
+### 3. Ask Questions
+
+```
+> how to find large files over 100MB
+```
+
+AI suggests: `find . -size +100M -type f`
+
+Press `Ctrl+E` to execute.
+
+---
+
+## Key Bindings
+
+### Chat & Commands
+
+| Key | Action |
+|-----|--------|
+| `Enter` | Send message to AI |
+| `Ctrl+E` | Execute suggested command |
+| `Ctrl+Y` | Copy command to clipboard |
+| `Ctrl+L` | Clear chat |
+| `Ctrl+R` | Show last command |
+| `Up/Down` | Navigate history |
+| `Esc` | Exit |
+
+### Tabs & Panes
+
+| Key | Action |
+|-----|--------|
+| `Ctrl+T` | New tab |
+| `Ctrl+W` | Close pane |
+| `Ctrl+\` | Vertical split |
+| `Ctrl+-` | Horizontal split |
+| `Alt+Arrow` | Navigate panes |
+| `Ctrl+Z` | Toggle zoom |
+
+### Collaboration
+
+| Key | Action |
+|-----|--------|
+| `Ctrl+S` | Share session |
+| `Ctrl+J` | Join session |
+| `Ctrl+D` | Disconnect |
+
+---
+
+## Configuration
+
+Config file: `~/.terminalizcrazy/config.toml`
+
+```toml
+# AI Provider
+ai_provider = "anthropic"  # anthropic, openai, ollama
+
+# Agent Mode
+agent_mode = "suggest"     # off, suggest, auto
+agent_max_tasks = 10
+
+# Ollama (Local AI)
+ollama_enabled = false
+ollama_url = "http://localhost:11434"
+ollama_model = "codellama"
+
+# Appearance
+theme = "default"          # default, dracula, monokai, nord, solarized
+
+[workspace]
+default_layout = "quad"    # quad, tall, wide, stack, single
+auto_save = true
+
+[appearance]
+theme_hot_reload = true
+```
+
+See [config.toml.example](config.toml.example) for all options.
+
+---
+
+## Agent Mode
+
+Agent Mode enables autonomous multi-step task execution:
+
+```
+> Set up a new React project with TypeScript and ESLint
+```
+
+Agent creates a plan:
+```
+Plan: React TypeScript Setup
+
+[1] npx create-react-app myapp --template typescript
+    Verification: myapp/ exists
+
+[2] cd myapp && npm install eslint --save-dev
+    Verification: eslint in package.json
+
+[3] npx eslint --init
+    Verification: .eslintrc.* exists
+```
+
+### Modes
+
+| Mode | Behavior |
+|------|----------|
+| `off` | No planning, single commands only |
+| `suggest` | Creates plans, asks for approval (recommended) |
+| `auto` | Executes LOW-risk commands automatically |
+
+---
+
+## Collaboration
+
+Share your terminal session in real-time:
+
+**Host:**
+1. Press `Ctrl+S`
+2. Share the code: `a1b2-c3d4`
+
+**Guest:**
+1. Press `Ctrl+J`
+2. Enter code: `a1b2-c3d4`
+
+All messages, commands, and outputs are synchronized with E2E encryption.
+
+---
+
+## Project Detection
+
+TerminalizCrazy automatically detects your project type:
+
+| File | Type | Icon |
+|------|------|------|
 | `go.mod` | Go | 🐹 |
 | `package.json` | Node.js | 📦 |
-| `requirements.txt`, `pyproject.toml` | Python | 🐍 |
+| `requirements.txt` | Python | 🐍 |
 | `Cargo.toml` | Rust | 🦀 |
-| `pom.xml`, `build.gradle` | Java | ☕ |
-| `*.csproj` | .NET | 🔷 |
-| `Gemfile` | Ruby | 💎 |
-| `composer.json` | PHP | 🐘 |
+| `pom.xml` | Java | ☕ |
 | `Dockerfile` | Docker | 🐳 |
-| `*.tf` | Terraform | 🏗️ |
 
-**Features:**
-- **Automatische Session-Namen**: `🐹 myproject (Bubble Tea)` statt `Session abc123`
-- **Projekt-Kontext für AI**: AI kennt das Framework und gibt passende Befehle
-- **Directory-Matching**: Sessions im gleichen Verzeichnis werden mit ★ markiert
-- **Framework-Erkennung**: Next.js, Django, Spring Boot, Gin, etc.
+The AI uses this context for better command suggestions.
 
-### Real-Time Collaboration
+---
 
-Terminal-Sessions mit anderen teilen wie Google Docs:
+## Documentation
 
-**Session teilen:**
-1. `Ctrl+S` drücken
-2. Share-Code wird angezeigt (z.B. `a1b2-c3d4`)
-3. Code an Teammitglieder senden
+- [Installation Guide](docs/erste-schritte/installation.md)
+- [Quick Start](docs/erste-schritte/schnellstart.md)
+- [Settings Reference](docs/referenz/einstellungen.md)
+- [Keybindings](docs/referenz/tastenkuerzel.md)
+- [Theme Customization](docs/referenz/themes.md)
+- [Agent Mode Guide](docs/anleitungen/agent-modus.md)
+- [Collaboration Guide](docs/anleitungen/zusammenarbeit.md)
+- [Plugin Development](docs/anleitungen/plugins.md)
 
-**Session beitreten:**
-1. `Ctrl+J` drücken
-2. Share-Code eingeben
-3. Automatische Synchronisation
-
-**Features:**
-- 📡 WebSocket-basierte Echtzeit-Synchronisation
-- 👥 User-Präsenz-Anzeige
-- 💬 Geteilte Chat-Nachrichten
-- ⌨️ Befehlsvorschläge sichtbar für alle
-- 🔒 Lokaler Server (standardmäßig Port 8765)
+---
 
 ## Development
 
-### Projektstruktur
-
-```
-terminalizcrazy/
-├── cmd/
-│   └── terminalizcrazy/     # Entry point
-│       └── main.go
-├── internal/
-│   ├── ai/                  # AI-Integration (Anthropic/OpenAI)
-│   ├── clipboard/           # Clipboard-Integration
-│   ├── collab/              # Real-Time Collaboration (WebSocket)
-│   ├── config/              # Konfiguration (Viper)
-│   ├── executor/            # Command Execution & Risk Assessment
-│   ├── project/             # Projekt-Erkennung (Smart Sessions)
-│   ├── secretguard/         # Secret-Erkennung und -Maskierung
-│   ├── storage/             # SQLite Persistenz (Sessions, History)
-│   └── tui/                 # Terminal UI (Bubble Tea)
-├── .env.example             # Umgebungsvariablen-Vorlage
-├── .gitignore
-├── config.toml.example      # Config-Vorlage
-├── go.mod / go.sum
-├── Makefile
-├── PROJECT_PLAN.md          # Projektplan und Architektur
-├── SECURITY_CHECKLIST.md    # Security-Guidelines
-└── README.md
-
-# Daten-Verzeichnis (automatisch erstellt)
-~/.terminalizcrazy/
-├── terminalizcrazy.db       # SQLite Datenbank
-└── config.toml              # User-Config (optional)
-```
-
-### Befehle
-
 ```bash
-# Bauen
+# Build
 make build
 
-# Tests ausführen
+# Test
 make test
 
-# Tests mit Coverage
+# Test with coverage
 make test-coverage
 
-# Code formatieren
-make fmt
-
-# Linter ausführen (benötigt golangci-lint)
+# Lint
 make lint
 
-# Für alle Plattformen bauen
+# Build all platforms
 make build-all
-
-# Aufräumen
-make clean
 ```
 
-### Tests
+See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines.
 
-```bash
-# Alle Tests
-go test ./...
+---
 
-# Mit Verbose Output
-go test -v ./...
+## Comparison
 
-# Einzelnes Package
-go test -v ./internal/secretguard/
-```
+| Feature | TerminalizCrazy | Warp | Wave |
+|---------|-----------------|------|------|
+| AI Commands | Yes | Yes | Yes |
+| Agent Mode | Yes (3 modes) | Yes | No |
+| Local AI (Ollama) | Yes | No | Yes |
+| Real-Time Collab | Yes (E2E encrypted) | Paid | No |
+| Tabs/Splits | Yes | Yes | No |
+| Open Source | Yes | No | Yes |
+| Windows Support | Yes | No | Yes |
+| SecretGuard | Yes | No | No |
 
-## Roadmap
+---
 
-### Phase 1 (MVP) ✅ Complete
-- [x] Projekt-Setup
-- [x] Basis TUI mit Bubble Tea
-- [x] SecretGuard Implementation
-- [x] AI-Integration (Claude/OpenAI)
-- [x] Command Execution mit Sicherheitsabfrage
-- [x] Risk Assessment für Befehle
+## License
 
-### Phase 2 ✅ Complete
-- [x] Session-Management & Persistenz
-- [x] Command-History (SQLite)
-- [x] History Navigation mit ↑↓
+MIT License - see [LICENSE](LICENSE) for details.
 
-### Phase 3 ✅ Complete
-- [x] Clipboard-Integration
-- [x] Session-Wiederherstellung
-- [x] Smart Sessions (Projekt-Erkennung)
-
-### Phase 4 ✅ Complete
-- [x] Real-Time Collaboration (WebSocket)
-- [x] User Presence Indicators
-- [x] Message Synchronization
-
-### Phase 5
-- [ ] Erweiterte AI-Features
-- [ ] Plugin-System (WASM)
-- [ ] Web-Version
-- [ ] Cloud-Hosted Collaboration Server
-
-## Contributing
-
-1. Fork das Repository
-2. Feature-Branch erstellen (`git checkout -b feature/amazing-feature`)
-3. Änderungen committen (`git commit -m 'feat: add amazing feature'`)
-4. Branch pushen (`git push origin feature/amazing-feature`)
-5. Pull Request erstellen
-
-## Lizenz
-
-MIT License - siehe [LICENSE](LICENSE) für Details.
+---
 
 ## Links
 
-- [PROJECT_PLAN.md](PROJECT_PLAN.md) - Detaillierter Projektplan
-- [SECURITY_CHECKLIST.md](SECURITY_CHECKLIST.md) - Security-Guidelines
-- [Charm.sh](https://charm.sh/) - TUI Framework
-- [Bubble Tea](https://github.com/charmbracelet/bubbletea) - TUI Library
+- [Documentation](docs/README.md)
+- [Changelog](CHANGELOG.md)
+- [Contributing](CONTRIBUTING.md)
+- [Security Policy](SECURITY_CHECKLIST.md)
+
+Built with [Bubble Tea](https://github.com/charmbracelet/bubbletea) and [Charm.sh](https://charm.sh/)
