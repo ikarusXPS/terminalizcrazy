@@ -3,6 +3,7 @@ package ai
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/terminalizcrazy/terminalizcrazy/internal/executor"
@@ -216,10 +217,11 @@ func TestAgent_ApprovePlan(t *testing.T) {
 		}
 		err := agent.ApprovePlan(context.Background(), "plan-1")
 		assert.NoError(t, err)
-		// Status may be Approved, Running, or Completed depending on goroutine timing
+		// Wait for goroutine to complete (empty tasks executes very fast)
+		time.Sleep(10 * time.Millisecond)
+		// Status should be Completed after goroutine finishes
 		status := agent.GetCurrentPlan().Status
-		assert.True(t, status == PlanStatusApproved || status == PlanStatusRunning || status == PlanStatusCompleted,
-			"expected status to be approved/running/completed, got %s", status)
+		assert.Equal(t, PlanStatusCompleted, status)
 	})
 }
 
