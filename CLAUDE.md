@@ -14,16 +14,15 @@ make build
 make run
 
 # Test
-go test ./...                          # All tests
-go test -v ./internal/secretguard/     # Single package
-make test-coverage                     # With coverage report
+go test ./...                              # All tests
+go test -v ./internal/ai/...               # Single package with verbose
+go test -v -run TestAgentMode ./internal/ai/  # Single test by name
+go test -cover ./...                       # With coverage summary
+make test-coverage                         # HTML coverage report
 
 # Lint & Format
 go fmt ./...
-make lint                              # Requires golangci-lint
-
-# Cross-platform build
-make build-all
+make lint                                  # Requires golangci-lint
 ```
 
 ## Environment Setup
@@ -55,15 +54,15 @@ main.go → config.Load() → tui.Run()
 | Package | Purpose |
 |---------|---------|
 | `internal/ai/` | AI clients (Anthropic, OpenAI, Ollama) + Agent mode + Planner |
-| `internal/tui/` | Bubble Tea TUI with pane/tab system, zoom, floating panes, input sync |
+| `internal/tui/` | Bubble Tea TUI with pane/tab system |
 | `internal/executor/` | Command execution with risk assessment |
 | `internal/storage/` | SQLite for sessions, messages, history, plans, workspaces |
-| `internal/collab/` | WebSocket collaboration + E2E encryption |
+| `internal/collab/` | WebSocket collaboration + E2E encryption (ECDH + AES-256-GCM) |
 | `internal/workflows/` | Reusable workflow templates |
-| `internal/plugins/` | Hook-based plugin system |
+| `internal/plugins/` | Hook-based plugin system (pre_command, post_command, pre_ai, post_ai) |
 | `internal/secretguard/` | API key/token detection and masking |
-| `internal/project/` | Project type detection (Go, Node, Python, etc.) |
-| `internal/theme/` | YAML theme system with hot-reload (Dracula, Nord, Catppuccin, etc.) |
+| `internal/project/` | Project type detection (Go, Node, Python, Rust, Java, etc.) |
+| `internal/theme/` | YAML theme system with hot-reload |
 | `internal/workspace/` | Workspace management with layout presets (quad, tall, wide, stack) |
 
 ### AI Integration Pattern
@@ -76,57 +75,43 @@ type Client interface {
 }
 ```
 
-Agent mode (`ai.Agent`) uses `ai.Planner` to create multi-step task plans that can be approved and executed.
+Agent mode (`ai.Agent`) uses `ai.Planner` to create multi-step task plans that can be approved and executed. Plans contain Tasks with verification (exit_code, output_contains, run_command).
 
 ### TUI Architecture
 
-The TUI uses Bubble Tea's Elm architecture (Model-Update-View):
+Uses Bubble Tea's Elm architecture (Model-Update-View):
 - `tui.Model` - Main state container
-- `tui.PaneManager` - Multi-pane layout with splits
-- `tui.TabBar` - Tab navigation
-- `tui/views/` - Extracted view components (ChatView, PlanView)
+- `tui.PaneManager` - Multi-pane layout with splits, zoom, floating panes
+- `tui.TabBar` - Tab navigation with keyboard shortcuts
 
 ### Storage Schema
 
 SQLite database at `~/.terminalizcrazy/terminalizcrazy.db`:
-- `sessions` - Terminal sessions
-- `messages` - Chat messages per session
+- `sessions`, `messages` - Chat persistence
 - `command_history` - Executed commands
-- `agent_plans` / `agent_tasks` - Agent execution plans
+- `agent_plans`, `agent_tasks` - Agent execution plans
 - `workflows` - Saved workflow templates
 - `workspaces` - Workspace layouts and pane states
 
-### Theme System
-
-YAML-based themes with hot-reload support:
-- Built-in themes: Dracula, Nord, Catppuccin Mocha, Gruvbox Dark, Tokyo Night
-- Custom themes: `~/.terminalizcrazy/themes/*.yaml`
-- Hot-reload: Themes reload automatically when files change
-
-### Workspace System
-
-Multiple workspace layouts with persistence:
-- `quad` - 2x2 grid (default)
-- `tall` - 1 main (60%) + 2 side stacked
-- `wide` - 1 top (60%) + 2 bottom
-- `stack` - 4 vertical panes
-
-### Pane Enhancements
-
-- **Zoom**: Toggle pane fullscreen (`Ctrl+Z`)
-- **Floating**: Toggle floating mode (`Alt+F`)
-- **Broadcast**: Sync input to all panes (`Ctrl+Shift+B`)
-
-### Collaboration
-
-WebSocket-based with optional E2E encryption:
-- `collab.Server` - Local collaboration server
-- `collab.CollabClient` - WebSocket client
-- `collab.CryptoSession` - ECDH + AES-256-GCM encryption
-
 ### Plugin System
 
-Hook-based architecture with priority ordering:
-- Hooks: `pre_command`, `post_command`, `pre_ai`, `post_ai`, etc.
-- Built-in plugins: SafetyPlugin, AliasPlugin, TimestampPlugin
-- Plugins implement `PluginHandler` interface
+Hook-based with priority ordering. Built-in plugins:
+- `SafetyPlugin` (priority 1) - Blocks dangerous commands
+- `AliasPlugin` (priority 10) - Command aliases (ll→ls -la, gs→git status)
+- `TimestampPlugin` - Adds timestamps to output
+- `HistoryLoggerPlugin` - Command history tracking
+
+### Key Keybindings
+
+| Key | Action |
+|-----|--------|
+| `Ctrl+E` | Execute last suggested command |
+| `Ctrl+Y` | Copy command to clipboard |
+| `Ctrl+T` | New tab |
+| `Ctrl+W` | Close pane |
+| `Ctrl+\` | Vertical split |
+| `Ctrl+-` | Horizontal split |
+| `Ctrl+Z` | Toggle pane zoom |
+| `Alt+Arrow` | Navigate panes |
+| `Ctrl+S` | Share session (collaboration) |
+| `Ctrl+J` | Join session |
