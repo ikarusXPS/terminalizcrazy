@@ -115,7 +115,7 @@ const (
 type PaneNode struct {
 	IsLeaf    bool
 	Pane      *Pane
-	Split     SplitDirection
+	SplitDir  SplitDirection
 	Ratio     float64 // 0.0 to 1.0
 	Children  [2]*PaneNode
 	X, Y      int
@@ -139,7 +139,7 @@ func (n *PaneNode) Split(direction SplitDirection, newPane *Pane) {
 	}
 
 	n.IsLeaf = false
-	n.Split = direction
+	n.SplitDir = direction
 	n.Ratio = 0.5
 
 	// Move current pane to first child
@@ -164,7 +164,7 @@ func (n *PaneNode) recalculateSizes() {
 		return
 	}
 
-	switch n.Split {
+	switch n.SplitDir {
 	case SplitHorizontal:
 		// Split top/bottom
 		topHeight := int(float64(n.Height) * n.Ratio)
@@ -290,7 +290,7 @@ func (n *PaneNode) View() string {
 	child0View := n.Children[0].View()
 	child1View := n.Children[1].View()
 
-	switch n.Split {
+	switch n.SplitDir {
 	case SplitHorizontal:
 		return lipgloss.JoinVertical(lipgloss.Left, child0View, child1View)
 	case SplitVertical:
