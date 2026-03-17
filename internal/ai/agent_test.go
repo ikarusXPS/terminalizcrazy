@@ -216,7 +216,10 @@ func TestAgent_ApprovePlan(t *testing.T) {
 		}
 		err := agent.ApprovePlan(context.Background(), "plan-1")
 		assert.NoError(t, err)
-		assert.Equal(t, PlanStatusApproved, agent.currentPlan.Status)
+		// Status may be Approved, Running, or Completed depending on goroutine timing
+		status := agent.GetCurrentPlan().Status
+		assert.True(t, status == PlanStatusApproved || status == PlanStatusRunning || status == PlanStatusCompleted,
+			"expected status to be approved/running/completed, got %s", status)
 	})
 }
 

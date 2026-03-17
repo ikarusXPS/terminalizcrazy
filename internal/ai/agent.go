@@ -208,7 +208,9 @@ func (a *Agent) ExecutePlan(ctx context.Context, plan *Plan) error {
 
 // executePlan runs through all tasks in the plan
 func (a *Agent) executePlan(ctx context.Context, plan *Plan) error {
+	a.mu.Lock()
 	plan.Status = PlanStatusRunning
+	a.mu.Unlock()
 
 	for {
 		task := plan.GetNextTask()
@@ -219,7 +221,9 @@ func (a *Agent) executePlan(ctx context.Context, plan *Plan) error {
 		// Execute the task
 		err := a.executeTask(ctx, plan, task)
 		if err != nil {
+			a.mu.Lock()
 			plan.Status = PlanStatusFailed
+			a.mu.Unlock()
 			if a.onTaskFailed != nil {
 				a.onTaskFailed(task)
 			}
@@ -227,9 +231,13 @@ func (a *Agent) executePlan(ctx context.Context, plan *Plan) error {
 		}
 	}
 
+	a.mu.Lock()
 	plan.Status = PlanStatusCompleted
-	if a.onPlanCompleted != nil {
-		a.onPlanCompleted(plan)
+	onComplete := a.onPlanCompleted
+	a.mu.Unlock()
+
+	if onComplete != nil {
+		onComplete(plan)
 	}
 
 	return nil

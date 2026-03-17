@@ -3,6 +3,7 @@ package theme
 import (
 	"os"
 	"path/filepath"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -381,9 +382,9 @@ colors:
 	err = manager.SetTheme("hot-theme")
 	require.NoError(t, err)
 
-	changeCount := 0
+	var changeCount int32
 	manager.OnChange(func(theme *Theme) {
-		changeCount++
+		atomic.AddInt32(&changeCount, 1)
 		_ = theme // Use theme to avoid lint warning
 	})
 
@@ -408,7 +409,7 @@ colors:
 
 	// Note: Hot reload may not trigger immediately in tests
 	// This is a basic test structure; in real usage, file watching works
-	_ = changeCount // Use changeCount to verify the callback was set
+	_ = atomic.LoadInt32(&changeCount) // Use changeCount to verify the callback was set
 }
 
 func TestManagerRegisterTheme(t *testing.T) {
