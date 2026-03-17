@@ -2,6 +2,7 @@ package tui
 
 import (
 	"github.com/charmbracelet/lipgloss"
+	"github.com/terminalizcrazy/terminalizcrazy/internal/theme"
 )
 
 // Color constants for theming
@@ -250,23 +251,100 @@ func GetTheme(name string) *Theme {
 }
 
 // ApplyTheme applies a theme to the styles
-func (s *Styles) ApplyTheme(theme *Theme) {
-	s.Title = s.Title.Foreground(lipgloss.Color(theme.Primary))
-	s.Input = s.Input.BorderForeground(lipgloss.Color(theme.Primary))
-	s.StatusConnected = s.StatusConnected.Foreground(lipgloss.Color(theme.Success))
-	s.StatusDisconnected = s.StatusDisconnected.Foreground(lipgloss.Color(theme.Warning))
-	s.UserMsg = s.UserMsg.Foreground(lipgloss.Color(theme.Primary))
-	s.AIMsg = s.AIMsg.Foreground(lipgloss.Color(theme.Success))
-	s.SystemMsg = s.SystemMsg.Foreground(lipgloss.Color(theme.Muted))
-	s.Error = s.Error.Foreground(lipgloss.Color(theme.Error))
-	s.Success = s.Success.Foreground(lipgloss.Color(theme.Success))
-	s.Spinner = s.Spinner.Foreground(lipgloss.Color(theme.Primary))
-	s.SessionSelected = s.SessionSelected.Foreground(lipgloss.Color(theme.Primary))
-	s.SessionHeader = s.SessionHeader.Foreground(lipgloss.Color(theme.Primary))
-	s.TabActive = s.TabActive.Foreground(lipgloss.Color(theme.Primary))
-	s.PaneFocused = s.PaneFocused.BorderForeground(lipgloss.Color(theme.Primary))
-	s.PaneTitle = s.PaneTitle.Foreground(lipgloss.Color(theme.Primary))
-	s.AgentStatus = s.AgentStatus.Foreground(lipgloss.Color(theme.Success))
-	s.AgentPlan = s.AgentPlan.BorderForeground(lipgloss.Color(theme.Success))
-	s.AgentProgress = s.AgentProgress.Foreground(lipgloss.Color(theme.Success))
+func (s *Styles) ApplyTheme(t *Theme) {
+	s.Title = s.Title.Foreground(lipgloss.Color(t.Primary))
+	s.Input = s.Input.BorderForeground(lipgloss.Color(t.Primary))
+	s.StatusConnected = s.StatusConnected.Foreground(lipgloss.Color(t.Success))
+	s.StatusDisconnected = s.StatusDisconnected.Foreground(lipgloss.Color(t.Warning))
+	s.UserMsg = s.UserMsg.Foreground(lipgloss.Color(t.Primary))
+	s.AIMsg = s.AIMsg.Foreground(lipgloss.Color(t.Success))
+	s.SystemMsg = s.SystemMsg.Foreground(lipgloss.Color(t.Muted))
+	s.Error = s.Error.Foreground(lipgloss.Color(t.Error))
+	s.Success = s.Success.Foreground(lipgloss.Color(t.Success))
+	s.Spinner = s.Spinner.Foreground(lipgloss.Color(t.Primary))
+	s.SessionSelected = s.SessionSelected.Foreground(lipgloss.Color(t.Primary))
+	s.SessionHeader = s.SessionHeader.Foreground(lipgloss.Color(t.Primary))
+	s.TabActive = s.TabActive.Foreground(lipgloss.Color(t.Primary))
+	s.PaneFocused = s.PaneFocused.BorderForeground(lipgloss.Color(t.Primary))
+	s.PaneTitle = s.PaneTitle.Foreground(lipgloss.Color(t.Primary))
+	s.AgentStatus = s.AgentStatus.Foreground(lipgloss.Color(t.Success))
+	s.AgentPlan = s.AgentPlan.BorderForeground(lipgloss.Color(t.Success))
+	s.AgentProgress = s.AgentProgress.Foreground(lipgloss.Color(t.Success))
+}
+
+// ApplyAdvancedTheme applies a full theme from the theme package
+func (s *Styles) ApplyAdvancedTheme(t *theme.Theme) {
+	if t == nil {
+		return
+	}
+
+	c := t.Colors
+
+	// Base styles
+	s.Title = s.Title.Foreground(lipgloss.Color(c.Primary))
+	s.Version = s.Version.Foreground(lipgloss.Color(c.Muted))
+	s.Input = s.Input.BorderForeground(lipgloss.Color(c.Primary))
+
+	// Status styles
+	s.StatusConnected = s.StatusConnected.Foreground(lipgloss.Color(c.Success))
+	s.StatusDisconnected = s.StatusDisconnected.Foreground(lipgloss.Color(c.Warning))
+
+	// Help
+	s.Help = s.Help.Foreground(lipgloss.Color(c.Muted))
+
+	// Message styles
+	s.UserMsg = s.UserMsg.Foreground(lipgloss.Color(c.UserMessage))
+	s.AIMsg = s.AIMsg.Foreground(lipgloss.Color(c.AIMessage))
+	s.SystemMsg = s.SystemMsg.Foreground(lipgloss.Color(c.SystemMessage))
+
+	// Command styles
+	s.Command = s.Command.
+		Background(lipgloss.Color(c.Background)).
+		Foreground(lipgloss.Color(c.Foreground))
+
+	s.Output = s.Output.Foreground(lipgloss.Color(c.Foreground))
+
+	// Feedback styles
+	s.Error = s.Error.Foreground(lipgloss.Color(c.Error))
+	s.Success = s.Success.Foreground(lipgloss.Color(c.Success))
+	s.Spinner = s.Spinner.Foreground(lipgloss.Color(c.Primary))
+
+	// History
+	s.History = s.History.Foreground(lipgloss.Color(c.Muted))
+	s.CopyNotice = s.CopyNotice.Foreground(lipgloss.Color(c.Success))
+
+	// Session styles
+	s.SessionItem = s.SessionItem.Foreground(lipgloss.Color(c.Foreground))
+	s.SessionSelected = s.SessionSelected.Foreground(lipgloss.Color(c.Primary))
+	s.SessionHeader = s.SessionHeader.Foreground(lipgloss.Color(c.Primary))
+
+	// Tab styles
+	s.Tab = s.Tab.Foreground(lipgloss.Color(c.Foreground))
+	s.TabActive = s.TabActive.
+		Foreground(lipgloss.Color(c.TabActive)).
+		Background(lipgloss.Color(c.Background))
+	s.TabInactive = s.TabInactive.Foreground(lipgloss.Color(c.TabInactive))
+	s.TabBar = s.TabBar.BorderForeground(lipgloss.Color(c.Muted))
+
+	// Pane styles
+	s.Pane = s.Pane.BorderForeground(lipgloss.Color(c.PaneBorderUnfocused))
+	s.PaneFocused = s.PaneFocused.BorderForeground(lipgloss.Color(c.PaneBorderFocused))
+	s.PaneUnfocused = s.PaneUnfocused.BorderForeground(lipgloss.Color(c.PaneBorderUnfocused))
+	s.PaneBorder = s.PaneBorder.BorderForeground(lipgloss.Color(c.PaneBorderUnfocused))
+	s.PaneTitle = s.PaneTitle.Foreground(lipgloss.Color(c.Primary))
+
+	// Agent styles
+	s.AgentStatus = s.AgentStatus.Foreground(lipgloss.Color(c.Success))
+	s.AgentPlan = s.AgentPlan.BorderForeground(lipgloss.Color(c.Secondary))
+	s.AgentTask = s.AgentTask.Foreground(lipgloss.Color(c.Foreground))
+	s.AgentProgress = s.AgentProgress.Foreground(lipgloss.Color(c.Secondary))
+}
+
+// NewStylesWithTheme creates new styles and applies a theme
+func NewStylesWithTheme(t *theme.Theme) *Styles {
+	s := DefaultStyles()
+	if t != nil {
+		s.ApplyAdvancedTheme(t)
+	}
+	return s
 }

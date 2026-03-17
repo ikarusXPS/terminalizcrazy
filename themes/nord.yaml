@@ -1,0 +1,38 @@
+name: "Nord"
+author: "Arctic Ice Studio"
+version: "1.0.0"
+
+colors:
+  # Base colors - Polar Night
+  background: "#2e3440"
+  foreground: "#eceff4"
+
+  # Semantic colors - Frost & Aurora
+  primary: "#88c0d0"
+  secondary: "#a3be8c"
+  warning: "#ebcb8b"
+  error: "#bf616a"
+  success: "#a3be8c"
+  muted: "#4c566a"
+
+  # Chat colors
+  user_message: "#81a1c1"
+  ai_message: "#a3be8c"
+  system_message: "#4c566a"
+
+  # UI element colors
+  pane_border_focused: "#88c0d0"
+  pane_border_unfocused: "#4c566a"
+  tab_active: "#88c0d0"
+  tab_inactive: "#4c566a"
+
+  # Additional palette colors
+  selection: "#434c5e"
+  comment: "#616e88"
+  cyan: "#8fbcbb"
+  green: "#a3be8c"
+  orange: "#d08770"
+  pink: "#b48ead"
+  purple: "#b48ead"
+  red: "#bf616a"
+  yellow: "#ebcb8b"

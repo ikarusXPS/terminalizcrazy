@@ -15,15 +15,23 @@ type PaneManager struct {
 	styles    *Styles
 	paneCount int
 	mu        sync.RWMutex
+
+	// Enhanced features
+	floating   *FloatingManager
+	zoom       *ZoomState
+	inputSync  *InputSynchronizer
 }
 
 // NewPaneManager creates a new pane manager
 func NewPaneManager(width, height int, styles *Styles) *PaneManager {
 	pm := &PaneManager{
-		panes:  make(map[string]*Pane),
-		width:  width,
-		height: height,
-		styles: styles,
+		panes:     make(map[string]*Pane),
+		width:     width,
+		height:    height,
+		styles:    styles,
+		floating:  NewFloatingManager(),
+		zoom:      NewZoomState(),
+		inputSync: NewInputSynchronizer(),
 	}
 
 	// Create default pane
@@ -443,4 +451,226 @@ func (pm *PaneManager) DuplicateFocused() *Pane {
 	pm.splitNodeContaining(pm.root, focused.ID, SplitVertical, newPane)
 
 	return newPane
+}
+
+// --- Zoom Methods ---
+
+// ToggleZoom toggles zoom on the focused pane
+func (pm *PaneManager) ToggleZoom() bool {
+	if pm.zoom.IsZoomed() {
+		return pm.RestoreZoom()
+	}
+	return pm.ZoomFocused()
+}
+
+// ZoomFocused zooms the currently focused pane to fill the entire area
+func (pm *PaneManager) ZoomFocused() bool {
+	pm.mu.Lock()
+	defer pm.mu.Unlock()
+
+	focused := pm.root.GetFocusedPane()
+	if focused == nil {
+		return false
+	}
+
+	// Save current layout
+	pm.zoom.SaveLayout(pm.root.GetPanes())
+	pm.zoom.SetZoomed(true, focused.ID)
+
+	// Set the focused pane to full size (will be handled in View)
+	return true
+}
+
+// RestoreZoom restores the layout from before zoom
+func (pm *PaneManager) RestoreZoom() bool {
+	if !pm.zoom.IsZoomed() {
+		return false
+	}
+
+	pm.mu.Lock()
+	defer pm.mu.Unlock()
+
+	snapshot := pm.zoom.GetSavedLayout()
+	if snapshot != nil {
+		// Restore pane sizes from snapshot
+		for _, ps := range snapshot.Panes {
+			if pane, ok := pm.panes[ps.ID]; ok {
+				pane.X = ps.X
+				pane.Y = ps.Y
+				pane.SetSize(ps.Width, ps.Height)
+			}
+		}
+	}
+
+	pm.zoom.ClearZoom()
+
+	// Recalculate layout
+	if pm.root != nil {
+		pm.root.SetSize(0, 0, pm.width, pm.height)
+	}
+
+	return true
+}
+
+// IsZoomed returns whether any pane is currently zoomed
+func (pm *PaneManager) IsZoomed() bool {
+	return pm.zoom.IsZoomed()
+}
+
+// GetZoomedPaneID returns the ID of the zoomed pane
+func (pm *PaneManager) GetZoomedPaneID() string {
+	return pm.zoom.GetZoomedPane()
+}
+
+// --- Floating Pane Methods ---
+
+// ToggleFloating toggles floating mode for the focused pane
+func (pm *PaneManager) ToggleFloating() bool {
+	pm.mu.Lock()
+	defer pm.mu.Unlock()
+
+	focused := pm.root.GetFocusedPane()
+	if focused == nil {
+		return false
+	}
+
+	if pm.floating.IsFloating(focused.ID) {
+		// Remove from floating
+		return pm.floating.Remove(focused.ID)
+	}
+
+	// Add to floating at center of screen
+	x := (pm.width - focused.Width) / 2
+	y := (pm.height - focused.Height) / 2
+	pm.floating.Add(focused, x, y)
+	return true
+}
+
+// MakeFloating makes a pane floating
+func (pm *PaneManager) MakeFloating(paneID string) *FloatingPane {
+	pm.mu.Lock()
+	defer pm.mu.Unlock()
+
+	pane, ok := pm.panes[paneID]
+	if !ok {
+		return nil
+	}
+
+	// Center the floating pane
+	x := (pm.width - pane.Width) / 2
+	y := (pm.height - pane.Height) / 2
+
+	return pm.floating.Add(pane, x, y)
+}
+
+// DockFloating docks a floating pane back to the layout
+func (pm *PaneManager) DockFloating(paneID string) bool {
+	return pm.floating.Remove(paneID)
+}
+
+// IsFloating checks if a pane is floating
+func (pm *PaneManager) IsFloating(paneID string) bool {
+	return pm.floating.IsFloating(paneID)
+}
+
+// GetFloatingPanes returns all floating panes
+func (pm *PaneManager) GetFloatingPanes() []*FloatingPane {
+	return pm.floating.GetAll()
+}
+
+// BringFloatingToFront brings a floating pane to the front
+func (pm *PaneManager) BringFloatingToFront(paneID string) {
+	pm.floating.BringToFront(paneID)
+}
+
+// --- Input Synchronization Methods ---
+
+// ToggleBroadcast toggles broadcast mode (send input to all panes)
+func (pm *PaneManager) ToggleBroadcast() bool {
+	return pm.inputSync.ToggleBroadcast()
+}
+
+// IsBroadcastEnabled returns whether broadcast mode is enabled
+func (pm *PaneManager) IsBroadcastEnabled() bool {
+	return pm.inputSync.IsBroadcastEnabled()
+}
+
+// CreateSyncGroup creates a new input sync group
+func (pm *PaneManager) CreateSyncGroup(id, name string) *SyncGroup {
+	return pm.inputSync.CreateGroup(id, name)
+}
+
+// AddPaneToSyncGroup adds a pane to a sync group
+func (pm *PaneManager) AddPaneToSyncGroup(groupID, paneID string) bool {
+	return pm.inputSync.AddPaneToGroup(groupID, paneID)
+}
+
+// RemovePaneFromSyncGroup removes a pane from its sync group
+func (pm *PaneManager) RemovePaneFromSyncGroup(paneID string) bool {
+	return pm.inputSync.RemovePaneFromGroup(paneID)
+}
+
+// GetSyncTargets returns panes that should receive synced input from a source pane
+func (pm *PaneManager) GetSyncTargets(sourcePaneID string) []string {
+	pm.mu.RLock()
+	allPaneIDs := make([]string, 0, len(pm.panes))
+	for id := range pm.panes {
+		allPaneIDs = append(allPaneIDs, id)
+	}
+	pm.mu.RUnlock()
+
+	return pm.inputSync.GetSyncTargets(sourcePaneID, allPaneIDs)
+}
+
+// GetInputSyncStatus returns a status string for the input synchronizer
+func (pm *PaneManager) GetInputSyncStatus() string {
+	return pm.inputSync.GetStatus()
+}
+
+// --- View with Enhanced Features ---
+
+// ViewWithEnhancements renders all panes including floating and zoom states
+func (pm *PaneManager) ViewWithEnhancements() string {
+	pm.mu.RLock()
+	defer pm.mu.RUnlock()
+
+	// If zoomed, show only the zoomed pane
+	if pm.zoom.IsZoomed() {
+		zoomedID := pm.zoom.GetZoomedPane()
+		if pane, ok := pm.panes[zoomedID]; ok {
+			// Temporarily set pane to full size for rendering
+			originalW, originalH := pane.Width, pane.Height
+			pane.SetSize(pm.width, pm.height)
+			view := pane.View()
+			pane.SetSize(originalW, originalH)
+			return view
+		}
+	}
+
+	// Normal view
+	baseView := pm.root.View()
+
+	// Overlay floating panes (they render on top)
+	// Note: In a real TUI, this would require proper compositing
+	// For now, floating panes are managed separately
+	return baseView
+}
+
+// GetStatusLine returns a status line showing current states
+func (pm *PaneManager) GetStatusLine() string {
+	status := ""
+
+	if pm.zoom.IsZoomed() {
+		status += "[ZOOMED] "
+	}
+
+	if pm.floating.GetCount() > 0 {
+		status += fmt.Sprintf("[%d FLOATING] ", pm.floating.GetCount())
+	}
+
+	if syncStatus := pm.inputSync.GetStatus(); syncStatus != "" {
+		status += syncStatus + " "
+	}
+
+	return status
 }

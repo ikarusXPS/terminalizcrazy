@@ -1,0 +1,38 @@
+name: "Catppuccin Mocha"
+author: "Catppuccin"
+version: "1.0.0"
+
+colors:
+  # Base colors
+  background: "#1e1e2e"
+  foreground: "#cdd6f4"
+
+  # Semantic colors
+  primary: "#cba6f7"
+  secondary: "#a6e3a1"
+  warning: "#fab387"
+  error: "#f38ba8"
+  success: "#a6e3a1"
+  muted: "#6c7086"
+
+  # Chat colors
+  user_message: "#f5c2e7"
+  ai_message: "#a6e3a1"
+  system_message: "#6c7086"
+
+  # UI element colors
+  pane_border_focused: "#cba6f7"
+  pane_border_unfocused: "#6c7086"
+  tab_active: "#cba6f7"
+  tab_inactive: "#6c7086"
+
+  # Additional palette colors (Catppuccin Mocha palette)
+  selection: "#313244"
+  comment: "#6c7086"
+  cyan: "#94e2d5"
+  green: "#a6e3a1"
+  orange: "#fab387"
+  pink: "#f5c2e7"
+  purple: "#cba6f7"
+  red: "#f38ba8"
+  yellow: "#f9e2af"

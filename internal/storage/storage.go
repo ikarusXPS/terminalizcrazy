@@ -147,9 +147,23 @@ func (s *Storage) migrate() error {
 		updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 	);
 
+	-- Workspaces table (for Phase 2)
+	CREATE TABLE IF NOT EXISTS workspaces (
+		id TEXT PRIMARY KEY,
+		name TEXT NOT NULL,
+		description TEXT,
+		layout TEXT NOT NULL,
+		panes_json TEXT,
+		active_pane TEXT,
+		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+		updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+	);
+
 	CREATE INDEX IF NOT EXISTS idx_agent_plans_session ON agent_plans(session_id);
 	CREATE INDEX IF NOT EXISTS idx_agent_tasks_plan ON agent_tasks(plan_id);
 	CREATE INDEX IF NOT EXISTS idx_workflows_name ON workflows(name);
+	CREATE INDEX IF NOT EXISTS idx_workspaces_name ON workspaces(name);
+	CREATE INDEX IF NOT EXISTS idx_workspaces_created ON workspaces(created_at);
 	`
 
 	_, err := s.db.Exec(schema)

@@ -1,0 +1,38 @@
+name: "Tokyo Night"
+author: "folke"
+version: "1.0.0"
+
+colors:
+  # Base colors
+  background: "#1a1b26"
+  foreground: "#c0caf5"
+
+  # Semantic colors
+  primary: "#7aa2f7"
+  secondary: "#9ece6a"
+  warning: "#e0af68"
+  error: "#f7768e"
+  success: "#9ece6a"
+  muted: "#565f89"
+
+  # Chat colors
+  user_message: "#bb9af7"
+  ai_message: "#9ece6a"
+  system_message: "#565f89"
+
+  # UI element colors
+  pane_border_focused: "#7aa2f7"
+  pane_border_unfocused: "#565f89"
+  tab_active: "#7aa2f7"
+  tab_inactive: "#565f89"
+
+  # Additional palette colors (Tokyo Night palette)
+  selection: "#283457"
+  comment: "#565f89"
+  cyan: "#7dcfff"
+  green: "#9ece6a"
+  orange: "#ff9e64"
+  pink: "#bb9af7"
+  purple: "#bb9af7"
+  red: "#f7768e"
+  yellow: "#e0af68"

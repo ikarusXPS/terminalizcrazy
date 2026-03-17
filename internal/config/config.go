@@ -28,6 +28,15 @@ type Config struct {
 	Theme         string `mapstructure:"theme"`
 	ShowWelcome   bool   `mapstructure:"show_welcome"`
 
+	// Appearance settings
+	Appearance AppearanceConfig `mapstructure:"appearance"`
+
+	// Pane settings
+	Pane PaneConfig `mapstructure:"pane"`
+
+	// Workspace settings
+	Workspace WorkspaceConfig `mapstructure:"workspace"`
+
 	// Session settings
 	SessionDir    string `mapstructure:"session_dir"`
 	HistoryLimit  int    `mapstructure:"history_limit"`
@@ -38,6 +47,35 @@ type Config struct {
 	// Debug settings
 	Debug    bool   `mapstructure:"debug"`
 	LogLevel string `mapstructure:"log_level"`
+}
+
+// AppearanceConfig holds appearance-related settings
+type AppearanceConfig struct {
+	Theme           string  `mapstructure:"theme"`
+	BackgroundColor string  `mapstructure:"background_color"`
+	Transparency    float64 `mapstructure:"transparency"`
+	EnableAnimations bool   `mapstructure:"enable_animations"`
+	FontSize        int     `mapstructure:"font_size"`
+	ThemeHotReload  bool    `mapstructure:"theme_hot_reload"`
+}
+
+// PaneConfig holds pane-related settings
+type PaneConfig struct {
+	BorderStyle       string  `mapstructure:"border_style"` // rounded, normal, double, hidden
+	ActiveBorderWidth int     `mapstructure:"active_border_width"`
+	InactiveOpacity   float64 `mapstructure:"inactive_opacity"`
+	ShowPaneTitles    bool    `mapstructure:"show_pane_titles"`
+	MinPaneWidth      int     `mapstructure:"min_pane_width"`
+	MinPaneHeight     int     `mapstructure:"min_pane_height"`
+}
+
+// WorkspaceConfig holds workspace-related settings
+type WorkspaceConfig struct {
+	DefaultLayout     string `mapstructure:"default_layout"` // quad, tall, wide, stack, single
+	AutoSave          bool   `mapstructure:"auto_save"`
+	AutoSaveInterval  int    `mapstructure:"auto_save_interval"` // seconds
+	RestoreOnStartup  bool   `mapstructure:"restore_on_startup"`
+	MaxWorkspaces     int    `mapstructure:"max_workspaces"`
 }
 
 // Load reads configuration from file and environment
@@ -59,6 +97,29 @@ func Load() (*Config, error) {
 	// Agent defaults
 	viper.SetDefault("agent_mode", "suggest")
 	viper.SetDefault("agent_max_tasks", 10)
+
+	// Appearance defaults
+	viper.SetDefault("appearance.theme", "default")
+	viper.SetDefault("appearance.background_color", "")
+	viper.SetDefault("appearance.transparency", 1.0)
+	viper.SetDefault("appearance.enable_animations", true)
+	viper.SetDefault("appearance.font_size", 14)
+	viper.SetDefault("appearance.theme_hot_reload", true)
+
+	// Pane defaults
+	viper.SetDefault("pane.border_style", "rounded")
+	viper.SetDefault("pane.active_border_width", 1)
+	viper.SetDefault("pane.inactive_opacity", 0.8)
+	viper.SetDefault("pane.show_pane_titles", true)
+	viper.SetDefault("pane.min_pane_width", 20)
+	viper.SetDefault("pane.min_pane_height", 5)
+
+	// Workspace defaults
+	viper.SetDefault("workspace.default_layout", "quad")
+	viper.SetDefault("workspace.auto_save", true)
+	viper.SetDefault("workspace.auto_save_interval", 60)
+	viper.SetDefault("workspace.restore_on_startup", true)
+	viper.SetDefault("workspace.max_workspaces", 10)
 
 	// Config file locations
 	home, err := os.UserHomeDir()
@@ -161,4 +222,88 @@ func (c *Config) GetAgentMode() string {
 		return "suggest"
 	}
 	return c.AgentMode
+}
+
+// GetTheme returns the theme name (from appearance or legacy theme field)
+func (c *Config) GetTheme() string {
+	if c.Appearance.Theme != "" {
+		return c.Appearance.Theme
+	}
+	if c.Theme != "" {
+		return c.Theme
+	}
+	return "default"
+}
+
+// GetThemesDir returns the themes directory path
+func (c *Config) GetThemesDir() string {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return ""
+	}
+	return filepath.Join(home, ".terminalizcrazy", "themes")
+}
+
+// GetConfigDir returns the config directory path
+func (c *Config) GetConfigDir() string {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return ""
+	}
+	return filepath.Join(home, ".terminalizcrazy")
+}
+
+// GetDataDir returns the data directory path (for database, etc.)
+func (c *Config) GetDataDir() string {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return ""
+	}
+	return filepath.Join(home, ".terminalizcrazy")
+}
+
+// GetBorderStyle returns the pane border style with validation
+func (c *Config) GetBorderStyle() string {
+	style := c.Pane.BorderStyle
+	switch style {
+	case "rounded", "normal", "double", "hidden":
+		return style
+	default:
+		return "rounded"
+	}
+}
+
+// GetDefaultLayout returns the default workspace layout with validation
+func (c *Config) GetDefaultLayout() string {
+	layout := c.Workspace.DefaultLayout
+	switch layout {
+	case "quad", "tall", "wide", "stack", "single":
+		return layout
+	default:
+		return "quad"
+	}
+}
+
+// GetTransparency returns the transparency value clamped to valid range
+func (c *Config) GetTransparency() float64 {
+	t := c.Appearance.Transparency
+	if t <= 0 {
+		return 1.0
+	}
+	if t > 1 {
+		return 1.0
+	}
+	return t
+}
+
+// GetInactiveOpacity returns the inactive pane opacity clamped to valid range
+func (c *Config) GetInactiveOpacity() float64 {
+	o := c.Pane.InactiveOpacity
+	if o <= 0 {
+		return 0.8
+	}
+	if o > 1 {
+		return 1.0
+	}
+	return o
 }
