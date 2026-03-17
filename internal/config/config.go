@@ -15,6 +15,15 @@ type Config struct {
 	AnthropicKey  string `mapstructure:"anthropic_api_key"`
 	OpenAIKey     string `mapstructure:"openai_api_key"`
 
+	// Ollama settings
+	OllamaURL     string `mapstructure:"ollama_url"`
+	OllamaModel   string `mapstructure:"ollama_model"`
+	OllamaEnabled bool   `mapstructure:"ollama_enabled"`
+
+	// Agent settings
+	AgentMode     string `mapstructure:"agent_mode"` // off, suggest, auto
+	AgentMaxTasks int    `mapstructure:"agent_max_tasks"`
+
 	// UI settings
 	Theme         string `mapstructure:"theme"`
 	ShowWelcome   bool   `mapstructure:"show_welcome"`
@@ -41,6 +50,15 @@ func Load() (*Config, error) {
 	viper.SetDefault("secret_guard_enabled", true)
 	viper.SetDefault("debug", false)
 	viper.SetDefault("log_level", "info")
+
+	// Ollama defaults
+	viper.SetDefault("ollama_url", "http://localhost:11434")
+	viper.SetDefault("ollama_model", "codellama")
+	viper.SetDefault("ollama_enabled", false)
+
+	// Agent defaults
+	viper.SetDefault("agent_mode", "suggest")
+	viper.SetDefault("agent_max_tasks", 10)
 
 	// Config file locations
 	home, err := os.UserHomeDir()
@@ -81,6 +99,15 @@ func Load() (*Config, error) {
 	viper.BindEnv("debug", "DEBUG")
 	viper.BindEnv("log_level", "LOG_LEVEL")
 
+	// Ollama environment variables
+	viper.BindEnv("ollama_url", "OLLAMA_URL")
+	viper.BindEnv("ollama_model", "OLLAMA_MODEL")
+	viper.BindEnv("ollama_enabled", "OLLAMA_ENABLED")
+
+	// Agent environment variables
+	viper.BindEnv("agent_mode", "AGENT_MODE")
+	viper.BindEnv("agent_max_tasks", "AGENT_MAX_TASKS")
+
 	// Unmarshal into config struct
 	var cfg Config
 	if err := viper.Unmarshal(&cfg); err != nil {
@@ -100,7 +127,38 @@ func (c *Config) GetActiveAIKey() string {
 	switch c.AIProvider {
 	case "openai":
 		return c.OpenAIKey
+	case "ollama":
+		return "" // Ollama doesn't need an API key
 	default:
 		return c.AnthropicKey
 	}
+}
+
+// IsOllamaConfigured returns true if Ollama is properly configured
+func (c *Config) IsOllamaConfigured() bool {
+	return c.OllamaEnabled && c.OllamaURL != ""
+}
+
+// GetOllamaURL returns the Ollama URL with default fallback
+func (c *Config) GetOllamaURL() string {
+	if c.OllamaURL == "" {
+		return "http://localhost:11434"
+	}
+	return c.OllamaURL
+}
+
+// GetOllamaModel returns the Ollama model with default fallback
+func (c *Config) GetOllamaModel() string {
+	if c.OllamaModel == "" {
+		return "codellama"
+	}
+	return c.OllamaModel
+}
+
+// GetAgentMode returns the agent mode with default fallback
+func (c *Config) GetAgentMode() string {
+	if c.AgentMode == "" {
+		return "suggest"
+	}
+	return c.AgentMode
 }

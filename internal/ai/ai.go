@@ -14,6 +14,7 @@ type Provider string
 const (
 	ProviderAnthropic Provider = "anthropic"
 	ProviderOpenAI    Provider = "openai"
+	// ProviderOllama is defined in ollama.go
 )
 
 // Request represents an AI request
@@ -88,7 +89,8 @@ type Service struct {
 
 // NewService creates a new AI service
 func NewService(provider Provider, apiKey string) (*Service, error) {
-	if apiKey == "" {
+	// Ollama doesn't require an API key
+	if provider != ProviderOllama && apiKey == "" {
 		return nil, errors.New("API key is required")
 	}
 
@@ -100,6 +102,8 @@ func NewService(provider Provider, apiKey string) (*Service, error) {
 		client, err = NewAnthropicClient(apiKey)
 	case ProviderOpenAI:
 		client, err = NewOpenAIClient(apiKey)
+	case ProviderOllama:
+		client, err = NewOllamaClient(nil) // Uses default config
 	default:
 		return nil, fmt.Errorf("unknown provider: %s", provider)
 	}
@@ -111,6 +115,19 @@ func NewService(provider Provider, apiKey string) (*Service, error) {
 	return &Service{
 		client:   client,
 		provider: provider,
+	}, nil
+}
+
+// NewServiceWithOllama creates an AI service with custom Ollama config
+func NewServiceWithOllama(config *OllamaConfig) (*Service, error) {
+	client, err := NewOllamaClient(config)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Service{
+		client:   client,
+		provider: ProviderOllama,
 	}, nil
 }
 

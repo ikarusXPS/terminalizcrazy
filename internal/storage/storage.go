@@ -108,6 +108,48 @@ func (s *Storage) migrate() error {
 	CREATE INDEX IF NOT EXISTS idx_messages_created ON messages(created_at);
 	CREATE INDEX IF NOT EXISTS idx_command_history_created ON command_history(created_at);
 	CREATE INDEX IF NOT EXISTS idx_command_history_command ON command_history(command);
+
+	-- Agent plans table
+	CREATE TABLE IF NOT EXISTS agent_plans (
+		id TEXT PRIMARY KEY,
+		session_id TEXT NOT NULL,
+		goal TEXT NOT NULL,
+		status TEXT DEFAULT 'pending',
+		current_task INTEGER DEFAULT 0,
+		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+		updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+		FOREIGN KEY (session_id) REFERENCES sessions(id) ON DELETE CASCADE
+	);
+
+	-- Agent tasks table
+	CREATE TABLE IF NOT EXISTS agent_tasks (
+		id TEXT PRIMARY KEY,
+		plan_id TEXT NOT NULL,
+		sequence INTEGER NOT NULL,
+		description TEXT NOT NULL,
+		command TEXT NOT NULL,
+		status TEXT DEFAULT 'pending',
+		output TEXT,
+		error TEXT,
+		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+		completed_at DATETIME,
+		FOREIGN KEY (plan_id) REFERENCES agent_plans(id) ON DELETE CASCADE
+	);
+
+	-- Workflows table (for Phase 3)
+	CREATE TABLE IF NOT EXISTS workflows (
+		id TEXT PRIMARY KEY,
+		name TEXT NOT NULL UNIQUE,
+		description TEXT,
+		steps TEXT NOT NULL,
+		variables TEXT,
+		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+		updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+	);
+
+	CREATE INDEX IF NOT EXISTS idx_agent_plans_session ON agent_plans(session_id);
+	CREATE INDEX IF NOT EXISTS idx_agent_tasks_plan ON agent_tasks(plan_id);
+	CREATE INDEX IF NOT EXISTS idx_workflows_name ON workflows(name);
 	`
 
 	_, err := s.db.Exec(schema)
@@ -401,5 +443,307 @@ func (s *Storage) GetStats() (map[string]int64, error) {
 	s.db.QueryRow("SELECT COUNT(*) FROM command_history").Scan(&count)
 	stats["commands"] = count
 
+	// Plans count
+	s.db.QueryRow("SELECT COUNT(*) FROM agent_plans").Scan(&count)
+	stats["plans"] = count
+
 	return stats, nil
+}
+
+// --- Agent Plan Methods ---
+
+// AgentPlan represents a stored agent plan
+type AgentPlan struct {
+	ID          string
+	SessionID   string
+	Goal        string
+	Status      string
+	CurrentTask int
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+}
+
+// AgentTask represents a stored agent task
+type AgentTask struct {
+	ID          string
+	PlanID      string
+	Sequence    int
+	Description string
+	Command     string
+	Status      string
+	Output      string
+	Error       string
+	CreatedAt   time.Time
+	CompletedAt *time.Time
+}
+
+// SaveAgentPlan saves an agent plan
+func (s *Storage) SaveAgentPlan(id, sessionID, goal, status string, currentTask int) (*AgentPlan, error) {
+	now := time.Now()
+
+	_, err := s.db.Exec(
+		`INSERT INTO agent_plans (id, session_id, goal, status, current_task, created_at, updated_at)
+		 VALUES (?, ?, ?, ?, ?, ?, ?)
+		 ON CONFLICT(id) DO UPDATE SET status = ?, current_task = ?, updated_at = ?`,
+		id, sessionID, goal, status, currentTask, now, now,
+		status, currentTask, now,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &AgentPlan{
+		ID:          id,
+		SessionID:   sessionID,
+		Goal:        goal,
+		Status:      status,
+		CurrentTask: currentTask,
+		CreatedAt:   now,
+		UpdatedAt:   now,
+	}, nil
+}
+
+// GetAgentPlan retrieves an agent plan by ID
+func (s *Storage) GetAgentPlan(id string) (*AgentPlan, error) {
+	var plan AgentPlan
+	err := s.db.QueryRow(
+		"SELECT id, session_id, goal, status, current_task, created_at, updated_at FROM agent_plans WHERE id = ?",
+		id,
+	).Scan(&plan.ID, &plan.SessionID, &plan.Goal, &plan.Status, &plan.CurrentTask, &plan.CreatedAt, &plan.UpdatedAt)
+
+	if err == sql.ErrNoRows {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	return &plan, nil
+}
+
+// ListAgentPlans returns agent plans for a session
+func (s *Storage) ListAgentPlans(sessionID string, limit int) ([]AgentPlan, error) {
+	rows, err := s.db.Query(
+		`SELECT id, session_id, goal, status, current_task, created_at, updated_at
+		 FROM agent_plans WHERE session_id = ?
+		 ORDER BY created_at DESC LIMIT ?`,
+		sessionID, limit,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var plans []AgentPlan
+	for rows.Next() {
+		var plan AgentPlan
+		if err := rows.Scan(&plan.ID, &plan.SessionID, &plan.Goal, &plan.Status, &plan.CurrentTask, &plan.CreatedAt, &plan.UpdatedAt); err != nil {
+			return nil, err
+		}
+		plans = append(plans, plan)
+	}
+
+	return plans, rows.Err()
+}
+
+// UpdateAgentPlanStatus updates an agent plan's status
+func (s *Storage) UpdateAgentPlanStatus(id, status string, currentTask int) error {
+	_, err := s.db.Exec(
+		"UPDATE agent_plans SET status = ?, current_task = ?, updated_at = ? WHERE id = ?",
+		status, currentTask, time.Now(), id,
+	)
+	return err
+}
+
+// DeleteAgentPlan deletes an agent plan and its tasks
+func (s *Storage) DeleteAgentPlan(id string) error {
+	_, err := s.db.Exec("DELETE FROM agent_plans WHERE id = ?", id)
+	return err
+}
+
+// --- Agent Task Methods ---
+
+// SaveAgentTask saves an agent task
+func (s *Storage) SaveAgentTask(id, planID string, sequence int, description, command, status string) (*AgentTask, error) {
+	now := time.Now()
+
+	_, err := s.db.Exec(
+		`INSERT INTO agent_tasks (id, plan_id, sequence, description, command, status, created_at)
+		 VALUES (?, ?, ?, ?, ?, ?, ?)
+		 ON CONFLICT(id) DO UPDATE SET status = ?, command = ?`,
+		id, planID, sequence, description, command, status, now,
+		status, command,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &AgentTask{
+		ID:          id,
+		PlanID:      planID,
+		Sequence:    sequence,
+		Description: description,
+		Command:     command,
+		Status:      status,
+		CreatedAt:   now,
+	}, nil
+}
+
+// GetAgentTasks retrieves tasks for a plan
+func (s *Storage) GetAgentTasks(planID string) ([]AgentTask, error) {
+	rows, err := s.db.Query(
+		`SELECT id, plan_id, sequence, description, command, status, output, error, created_at, completed_at
+		 FROM agent_tasks WHERE plan_id = ?
+		 ORDER BY sequence ASC`,
+		planID,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var tasks []AgentTask
+	for rows.Next() {
+		var task AgentTask
+		var output, errMsg sql.NullString
+		var completedAt sql.NullTime
+
+		if err := rows.Scan(&task.ID, &task.PlanID, &task.Sequence, &task.Description, &task.Command,
+			&task.Status, &output, &errMsg, &task.CreatedAt, &completedAt); err != nil {
+			return nil, err
+		}
+
+		if output.Valid {
+			task.Output = output.String
+		}
+		if errMsg.Valid {
+			task.Error = errMsg.String
+		}
+		if completedAt.Valid {
+			task.CompletedAt = &completedAt.Time
+		}
+
+		tasks = append(tasks, task)
+	}
+
+	return tasks, rows.Err()
+}
+
+// UpdateAgentTask updates an agent task
+func (s *Storage) UpdateAgentTask(id, status, output, errMsg string) error {
+	var completedAt interface{}
+	if status == "completed" || status == "failed" || status == "skipped" {
+		completedAt = time.Now()
+	}
+
+	_, err := s.db.Exec(
+		"UPDATE agent_tasks SET status = ?, output = ?, error = ?, completed_at = ? WHERE id = ?",
+		status, output, errMsg, completedAt, id,
+	)
+	return err
+}
+
+// --- Workflow Methods ---
+
+// Workflow represents a stored workflow
+type Workflow struct {
+	ID          string
+	Name        string
+	Description string
+	Steps       string // JSON encoded
+	Variables   string // JSON encoded
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+}
+
+// SaveWorkflow saves a workflow
+func (s *Storage) SaveWorkflow(name, description, steps, variables string) (*Workflow, error) {
+	id := fmt.Sprintf("wf-%d", time.Now().UnixNano()%1000000)
+	now := time.Now()
+
+	_, err := s.db.Exec(
+		`INSERT INTO workflows (id, name, description, steps, variables, created_at, updated_at)
+		 VALUES (?, ?, ?, ?, ?, ?, ?)
+		 ON CONFLICT(name) DO UPDATE SET description = ?, steps = ?, variables = ?, updated_at = ?`,
+		id, name, description, steps, variables, now, now,
+		description, steps, variables, now,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Workflow{
+		ID:          id,
+		Name:        name,
+		Description: description,
+		Steps:       steps,
+		Variables:   variables,
+		CreatedAt:   now,
+		UpdatedAt:   now,
+	}, nil
+}
+
+// GetWorkflow retrieves a workflow by name
+func (s *Storage) GetWorkflow(name string) (*Workflow, error) {
+	var wf Workflow
+	var desc, vars sql.NullString
+
+	err := s.db.QueryRow(
+		"SELECT id, name, description, steps, variables, created_at, updated_at FROM workflows WHERE name = ?",
+		name,
+	).Scan(&wf.ID, &wf.Name, &desc, &wf.Steps, &vars, &wf.CreatedAt, &wf.UpdatedAt)
+
+	if err == sql.ErrNoRows {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	if desc.Valid {
+		wf.Description = desc.String
+	}
+	if vars.Valid {
+		wf.Variables = vars.String
+	}
+
+	return &wf, nil
+}
+
+// ListWorkflows returns all workflows
+func (s *Storage) ListWorkflows() ([]Workflow, error) {
+	rows, err := s.db.Query(
+		"SELECT id, name, description, steps, variables, created_at, updated_at FROM workflows ORDER BY name ASC",
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var workflows []Workflow
+	for rows.Next() {
+		var wf Workflow
+		var desc, vars sql.NullString
+
+		if err := rows.Scan(&wf.ID, &wf.Name, &desc, &wf.Steps, &vars, &wf.CreatedAt, &wf.UpdatedAt); err != nil {
+			return nil, err
+		}
+
+		if desc.Valid {
+			wf.Description = desc.String
+		}
+		if vars.Valid {
+			wf.Variables = vars.String
+		}
+
+		workflows = append(workflows, wf)
+	}
+
+	return workflows, rows.Err()
+}
+
+// DeleteWorkflow deletes a workflow
+func (s *Storage) DeleteWorkflow(name string) error {
+	_, err := s.db.Exec("DELETE FROM workflows WHERE name = ?", name)
+	return err
 }
