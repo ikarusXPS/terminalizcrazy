@@ -1,0 +1,25 @@
+# TerminalizCrazy Configuration
+# Copy to ~/.terminalizcrazy/config.toml
+
+# AI Provider settings
+# Options: "anthropic" (default), "openai"
+ai_provider = "anthropic"
+
+# UI Theme
+# Options: "default", "dark", "light"
+theme = "default"
+
+# Show welcome screen on startup
+show_welcome = true
+
+# Maximum number of commands to keep in history
+history_limit = 1000
+
+# Enable SecretGuard (automatic secret masking)
+secret_guard_enabled = true
+
+# Debug mode (verbose logging)
+debug = false
+
+# Log level: "debug", "info", "warn", "error"
+log_level = "info"
