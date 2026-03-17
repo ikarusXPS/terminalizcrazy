@@ -1,25 +1,293 @@
-# TerminalizCrazy Configuration
-# Copy to ~/.terminalizcrazy/config.toml
+# ============================================================================
+# TerminalizCrazy Konfiguration
+# ============================================================================
+#
+# Speicherort: ~/.terminalizcrazy/config.toml
+# Alle Einstellungen können auch über Umgebungsvariablen gesetzt werden.
+# Format: TERMINALIZCRAZY_<EINSTELLUNG> oder spezielle Variablen wie ANTHROPIC_API_KEY
+#
+# Diese Datei enthält alle verfügbaren Einstellungen mit Erklärungen.
+# Kopieren Sie diese Datei nach ~/.terminalizcrazy/config.toml und passen Sie
+# die Werte nach Bedarf an.
+# ============================================================================
 
-# AI Provider settings
-# Options: "anthropic" (default), "openai"
+# ============================================================================
+# KI-ANBIETER
+# ============================================================================
+
+# Aktiver KI-Anbieter für Befehlsvorschläge und Chat
+# Optionen: "anthropic" (Claude), "openai" (GPT), "ollama" (lokal)
+# Standard: "anthropic"
+# Umgebungsvariable: AI_PROVIDER
 ai_provider = "anthropic"
 
-# UI Theme
-# Options: "default", "dark", "light"
+# Anthropic (Claude) API-Schlüssel
+# Erforderlich wenn ai_provider = "anthropic"
+# Format: sk-ant-api03-xxxxx
+# Umgebungsvariable: ANTHROPIC_API_KEY
+# WICHTIG: Niemals in Versionskontrolle committen!
+anthropic_api_key = ""
+
+# OpenAI API-Schlüssel
+# Erforderlich wenn ai_provider = "openai"
+# Format: sk-xxxxxxxx
+# Umgebungsvariable: OPENAI_API_KEY
+# WICHTIG: Niemals in Versionskontrolle committen!
+openai_api_key = ""
+
+# ============================================================================
+# OLLAMA (LOKALE KI)
+# ============================================================================
+# Ollama ermöglicht die Nutzung von KI-Modellen ohne externe API.
+# Installation: https://ollama.ai
+
+# Ollama aktivieren
+# Wenn true, wird Ollama anstelle von Cloud-APIs verwendet
+# Standard: false
+# Umgebungsvariable: OLLAMA_ENABLED
+ollama_enabled = false
+
+# Ollama Server-URL
+# Standard: "http://localhost:11434"
+# Umgebungsvariable: OLLAMA_URL
+ollama_url = "http://localhost:11434"
+
+# Ollama Modell
+# Empfohlen für Code: codellama, deepseek-coder
+# Allgemein: llama2, llama3, mistral, mixtral
+# Modell muss zuerst mit 'ollama pull <modell>' heruntergeladen werden
+# Standard: "codellama"
+# Umgebungsvariable: OLLAMA_MODEL
+ollama_model = "codellama"
+
+# ============================================================================
+# AGENT-MODUS
+# ============================================================================
+# Der Agent-Modus ermöglicht komplexere Aufgaben durch automatische Planung.
+
+# Agent-Modus
+# "off"     - Deaktiviert (nur einfache Befehlsvorschläge)
+# "suggest" - Erstellt Pläne, führt aber nichts automatisch aus (Standard)
+# "auto"    - Führt sichere Befehle automatisch aus (VORSICHT!)
+# Standard: "suggest"
+# Umgebungsvariable: AGENT_MODE
+agent_mode = "suggest"
+
+# Maximale Anzahl von Tasks pro Plan
+# Begrenzt die Komplexität eines einzelnen Plans
+# Niedrigere Werte = konservativer, höhere Werte = mehr Automatisierung
+# Bereich: 1-50
+# Standard: 10
+# Umgebungsvariable: AGENT_MAX_TASKS
+agent_max_tasks = 10
+
+# ============================================================================
+# BENUTZEROBERFLÄCHE
+# ============================================================================
+
+# Farbschema
+# Eingebaute Themes: "default", "dracula", "monokai", "nord"
+# Benutzerdefinierte Themes: ~/.terminalizcrazy/themes/<name>.yaml
+# Standard: "default"
 theme = "default"
 
-# Show welcome screen on startup
+# Willkommensnachricht anzeigen
+# Zeigt Projektinformationen und Tastenkürzel beim Start
+# Standard: true
 show_welcome = true
 
-# Maximum number of commands to keep in history
-history_limit = 1000
+# ============================================================================
+# ERSCHEINUNG (APPEARANCE)
+# ============================================================================
 
-# Enable SecretGuard (automatic secret masking)
+[appearance]
+# Farbschema (überschreibt 'theme' oben wenn gesetzt)
+# Standard: "default"
+theme = "default"
+
+# Benutzerdefinierte Hintergrundfarbe
+# Hex-Format: "#RRGGBB" oder "" für Theme-Standard
+# Beispiel: "#1a1b26" für Tokyo Night Hintergrund
+# Standard: "" (Theme-Standard)
+background_color = ""
+
+# Transparenz des Fensters
+# Bereich: 0.0 (vollständig transparent) bis 1.0 (vollständig undurchsichtig)
+# Hinweis: Benötigt Terminal-Unterstützung
+# Standard: 1.0
+transparency = 1.0
+
+# Animationen aktivieren
+# Aktiviert Übergänge und Lade-Animationen
+# Deaktivieren für bessere Performance auf älteren Systemen
+# Standard: true
+enable_animations = true
+
+# Schriftgröße (informativ)
+# Hinweis: Wird vom Terminal gesteuert, nicht von der Anwendung
+# Standard: 14
+font_size = 14
+
+# Theme Hot-Reload
+# Lädt Theme-Änderungen automatisch neu
+# Nützlich für Theme-Entwicklung
+# Standard: true
+theme_hot_reload = true
+
+# ============================================================================
+# PANEL-EINSTELLUNGEN (PANE)
+# ============================================================================
+
+[pane]
+# Rahmenstil für Panels
+# "rounded" - Abgerundete Ecken (Standard)
+# "normal"  - Einfache Linien
+# "double"  - Doppelte Linien
+# "hidden"  - Keine Rahmen
+# Standard: "rounded"
+border_style = "rounded"
+
+# Rahmenbreite des aktiven Panels
+# Hebt das fokussierte Panel hervor
+# Bereich: 1-3
+# Standard: 1
+active_border_width = 1
+
+# Deckkraft inaktiver Panels
+# Bereich: 0.0 (unsichtbar) bis 1.0 (volle Deckkraft)
+# Niedrigere Werte = stärkere visuelle Unterscheidung
+# Standard: 0.8
+inactive_opacity = 0.8
+
+# Panel-Titel anzeigen
+# Zeigt den Typ/Namen über jedem Panel
+# Standard: true
+show_pane_titles = true
+
+# Minimale Panel-Breite in Zeichen
+# Verhindert zu schmale Panels beim Teilen
+# Standard: 20
+min_pane_width = 20
+
+# Minimale Panel-Höhe in Zeilen
+# Verhindert zu niedrige Panels beim Teilen
+# Standard: 5
+min_pane_height = 5
+
+# ============================================================================
+# WORKSPACE-EINSTELLUNGEN
+# ============================================================================
+
+[workspace]
+# Standard-Layout für neue Workspaces
+# "quad"   - 2x2 Raster (Standard)
+# "tall"   - Großes Hauptpanel + 2 seitliche Panels
+# "wide"   - Großes oberes Panel + 2 untere Panels
+# "stack"  - 4 vertikal gestapelte Panels
+# "single" - Einzelnes Panel (klassisch)
+# Standard: "quad"
+default_layout = "quad"
+
+# Automatisches Speichern von Workspace-Änderungen
+# Speichert Panel-Positionen und -Inhalte automatisch
+# Standard: true
+auto_save = true
+
+# Auto-Save Intervall in Sekunden
+# Wie oft der Workspace automatisch gespeichert wird
+# Niedrigere Werte = häufiger, aber mehr I/O
+# Bereich: 10-600
+# Standard: 60
+auto_save_interval = 60
+
+# Workspace beim Start wiederherstellen
+# Stellt den letzten Workspace automatisch wieder her
+# Standard: true
+restore_on_startup = true
+
+# Maximale Anzahl gespeicherter Workspaces
+# Älteste werden automatisch gelöscht
+# Bereich: 1-50
+# Standard: 10
+max_workspaces = 10
+
+# ============================================================================
+# SICHERHEIT
+# ============================================================================
+
+# SecretGuard aktivieren
+# Erkennt und maskiert automatisch Geheimnisse (API-Keys, Tokens)
+# in der Ausgabe. Verhindert versehentliche Exposition.
+# Erkannte Typen: AWS Keys, GitHub Tokens, JWT, API Keys, Private Keys
+# Standard: true
+# EMPFEHLUNG: Immer aktiviert lassen!
 secret_guard_enabled = true
 
-# Debug mode (verbose logging)
+# ============================================================================
+# SPEICHER & HISTORIE
+# ============================================================================
+
+# Verzeichnis für Session-Daten
+# Standard: ~/.terminalizcrazy/sessions
+# session_dir = ""
+
+# Maximale Anzahl von History-Einträgen
+# Begrenzt die Anzahl gespeicherter Befehle
+# Bereich: 100-10000
+# Standard: 1000
+history_limit = 1000
+
+# ============================================================================
+# DEBUGGING
+# ============================================================================
+
+# Debug-Modus
+# Aktiviert ausführliche Logging-Ausgaben
+# Nützlich für Fehlerbehebung
+# Standard: false
+# Umgebungsvariable: DEBUG
 debug = false
 
-# Log level: "debug", "info", "warn", "error"
+# Log-Level
+# "debug" - Alle Meldungen
+# "info"  - Information und wichtiger (Standard)
+# "warn"  - Nur Warnungen und Fehler
+# "error" - Nur Fehler
+# Standard: "info"
+# Umgebungsvariable: LOG_LEVEL
 log_level = "info"
+
+# ============================================================================
+# BEISPIELKONFIGURATIONEN
+# ============================================================================
+
+# --- Minimale Konfiguration (Claude) ---
+# ai_provider = "anthropic"
+# anthropic_api_key = "sk-ant-api03-xxx"
+
+# --- Lokale KI mit Ollama ---
+# ai_provider = "ollama"
+# ollama_enabled = true
+# ollama_model = "codellama"
+
+# --- Sicherheitsbewusste Konfiguration ---
+# agent_mode = "off"
+# secret_guard_enabled = true
+# history_limit = 500
+
+# --- Entwickler-Setup ---
+# agent_mode = "suggest"
+# debug = true
+# log_level = "debug"
+# [appearance]
+# theme_hot_reload = true
+
+# --- Minimalistisch ---
+# theme = "nord"
+# [appearance]
+# enable_animations = false
+# [pane]
+# border_style = "hidden"
+# show_pane_titles = false
+# [workspace]
+# default_layout = "single"
