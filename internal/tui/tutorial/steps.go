@@ -116,7 +116,7 @@ func GetSteps() []Step {
 		},
 		{
 			ID:          "complete",
-			Title:       "Fertig\!",
+			Title:       "Fertig!",
 			Description: CompleteDescription,
 			Instruction: "Druecken Sie Enter um zu beginnen",
 			KeyHint:     "Enter",
