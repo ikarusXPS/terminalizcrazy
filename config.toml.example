@@ -238,6 +238,32 @@ max_workspaces = 10
 secret_guard_enabled = true
 
 # ============================================================================
+# DATENSPEICHERUNG (DSGVO-COMPLIANCE)
+# ============================================================================
+# Konfiguriert automatische Löschung alter Daten gemäß DSGVO Art. 17
+
+[retention]
+# Aufbewahrungsdauer für Chat-Nachrichten (Tage)
+# 0 = unbegrenzt aufbewahren
+# Standard: 90
+message_retention_days = 90
+
+# Aufbewahrungsdauer für Befehlshistorie (Tage)
+# 0 = unbegrenzt aufbewahren
+# Standard: 90
+command_history_retention_days = 90
+
+# Aufbewahrungsdauer für Agent-Pläne (Tage)
+# 0 = unbegrenzt aufbewahren
+# Standard: 30
+agent_plan_retention_days = 30
+
+# Automatische Bereinigung beim Start
+# Löscht alte Daten automatisch beim Programmstart
+# Standard: true
+auto_cleanup_enabled = true
+
+# ============================================================================
 # SPEICHER & HISTORIE
 # ============================================================================
 

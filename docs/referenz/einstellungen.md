@@ -280,6 +280,49 @@ Siehe [Secret Guard](../konzepte/secret-guard.md).
 
 ---
 
+## Datenspeicherung [retention] (DSGVO)
+
+### retention.message_retention_days
+
+| Eigenschaft | Wert |
+|-------------|------|
+| Typ | int |
+| Standard | 90 |
+| Bereich | 0 = unbegrenzt |
+
+Aufbewahrungsdauer für Chat-Nachrichten in Tagen.
+
+### retention.command_history_retention_days
+
+| Eigenschaft | Wert |
+|-------------|------|
+| Typ | int |
+| Standard | 90 |
+| Bereich | 0 = unbegrenzt |
+
+Aufbewahrungsdauer für Befehlshistorie in Tagen.
+
+### retention.agent_plan_retention_days
+
+| Eigenschaft | Wert |
+|-------------|------|
+| Typ | int |
+| Standard | 30 |
+| Bereich | 0 = unbegrenzt |
+
+Aufbewahrungsdauer für Agent-Pläne in Tagen.
+
+### retention.auto_cleanup_enabled
+
+| Eigenschaft | Wert |
+|-------------|------|
+| Typ | bool |
+| Standard | true |
+
+Aktiviert automatische Bereinigung alter Daten beim Programmstart.
+
+---
+
 ## Speicher und Historie
 
 ### history_limit

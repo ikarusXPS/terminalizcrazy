@@ -766,3 +766,279 @@ func (s *Storage) DeleteWorkflow(name string) error {
 	_, err := s.db.Exec("DELETE FROM workflows WHERE name = ?", name)
 	return err
 }
+
+// --- Data Retention Methods (GDPR Compliance) ---
+
+// RetentionStats holds statistics about data cleanup
+type RetentionStats struct {
+	MessagesDeleted       int64
+	CommandsDeleted       int64
+	AgentPlansDeleted     int64
+	SessionsDeleted       int64
+}
+
+// CleanupOldMessages deletes messages older than the specified number of days
+func (s *Storage) CleanupOldMessages(retentionDays int) (int64, error) {
+	if retentionDays <= 0 {
+		return 0, nil // 0 means keep forever
+	}
+
+	result, err := s.db.Exec(`
+		DELETE FROM messages
+		WHERE created_at < datetime('now', '-' || ? || ' days')
+	`, retentionDays)
+	if err != nil {
+		return 0, fmt.Errorf("failed to cleanup messages: %w", err)
+	}
+
+	return result.RowsAffected()
+}
+
+// CleanupOldCommandHistory deletes command history older than the specified number of days
+func (s *Storage) CleanupOldCommandHistory(retentionDays int) (int64, error) {
+	if retentionDays <= 0 {
+		return 0, nil // 0 means keep forever
+	}
+
+	result, err := s.db.Exec(`
+		DELETE FROM command_history
+		WHERE executed_at < datetime('now', '-' || ? || ' days')
+	`, retentionDays)
+	if err != nil {
+		return 0, fmt.Errorf("failed to cleanup command history: %w", err)
+	}
+
+	return result.RowsAffected()
+}
+
+// CleanupOldAgentPlans deletes agent plans older than the specified number of days
+func (s *Storage) CleanupOldAgentPlans(retentionDays int) (int64, error) {
+	if retentionDays <= 0 {
+		return 0, nil // 0 means keep forever
+	}
+
+	// Delete tasks first (foreign key constraint)
+	_, err := s.db.Exec(`
+		DELETE FROM agent_tasks
+		WHERE plan_id IN (
+			SELECT id FROM agent_plans
+			WHERE created_at < datetime('now', '-' || ? || ' days')
+		)
+	`, retentionDays)
+	if err != nil {
+		return 0, fmt.Errorf("failed to cleanup agent tasks: %w", err)
+	}
+
+	// Delete plans
+	result, err := s.db.Exec(`
+		DELETE FROM agent_plans
+		WHERE created_at < datetime('now', '-' || ? || ' days')
+	`, retentionDays)
+	if err != nil {
+		return 0, fmt.Errorf("failed to cleanup agent plans: %w", err)
+	}
+
+	return result.RowsAffected()
+}
+
+// CleanupEmptySessions deletes sessions that have no messages
+func (s *Storage) CleanupEmptySessions() (int64, error) {
+	result, err := s.db.Exec(`
+		DELETE FROM sessions
+		WHERE id NOT IN (SELECT DISTINCT session_id FROM messages)
+	`)
+	if err != nil {
+		return 0, fmt.Errorf("failed to cleanup empty sessions: %w", err)
+	}
+
+	return result.RowsAffected()
+}
+
+// RunRetentionCleanup performs a full retention cleanup based on the provided settings
+func (s *Storage) RunRetentionCleanup(messageRetentionDays, commandRetentionDays, planRetentionDays int) (*RetentionStats, error) {
+	stats := &RetentionStats{}
+
+	// Cleanup messages
+	messagesDeleted, err := s.CleanupOldMessages(messageRetentionDays)
+	if err != nil {
+		return stats, fmt.Errorf("message cleanup failed: %w", err)
+	}
+	stats.MessagesDeleted = messagesDeleted
+
+	// Cleanup command history
+	commandsDeleted, err := s.CleanupOldCommandHistory(commandRetentionDays)
+	if err != nil {
+		return stats, fmt.Errorf("command history cleanup failed: %w", err)
+	}
+	stats.CommandsDeleted = commandsDeleted
+
+	// Cleanup agent plans
+	plansDeleted, err := s.CleanupOldAgentPlans(planRetentionDays)
+	if err != nil {
+		return stats, fmt.Errorf("agent plan cleanup failed: %w", err)
+	}
+	stats.AgentPlansDeleted = plansDeleted
+
+	// Cleanup empty sessions
+	sessionsDeleted, err := s.CleanupEmptySessions()
+	if err != nil {
+		return stats, fmt.Errorf("empty session cleanup failed: %w", err)
+	}
+	stats.SessionsDeleted = sessionsDeleted
+
+	return stats, nil
+}
+
+// ExportUserData exports all user data for GDPR data portability (Art. 20)
+func (s *Storage) ExportUserData() (map[string]interface{}, error) {
+	export := make(map[string]interface{})
+
+	// Export sessions (no limit for export)
+	sessions, err := s.ListSessions(10000)
+	if err != nil {
+		return nil, fmt.Errorf("failed to export sessions: %w", err)
+	}
+	export["sessions"] = sessions
+
+	// Export all messages
+	var messages []map[string]interface{}
+	rows, err := s.db.Query(`
+		SELECT id, session_id, role, content, command, success, created_at
+		FROM messages ORDER BY created_at
+	`)
+	if err != nil {
+		return nil, fmt.Errorf("failed to export messages: %w", err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var id, sessionID, role, content string
+		var command sql.NullString
+		var success sql.NullBool
+		var createdAt time.Time
+
+		if err := rows.Scan(&id, &sessionID, &role, &content, &command, &success, &createdAt); err != nil {
+			return nil, err
+		}
+
+		msg := map[string]interface{}{
+			"id":         id,
+			"session_id": sessionID,
+			"role":       role,
+			"content":    content,
+			"created_at": createdAt.Format(time.RFC3339),
+		}
+		if command.Valid {
+			msg["command"] = command.String
+		}
+		if success.Valid {
+			msg["success"] = success.Bool
+		}
+		messages = append(messages, msg)
+	}
+	export["messages"] = messages
+
+	// Export command history
+	var commands []map[string]interface{}
+	cmdRows, err := s.db.Query(`
+		SELECT id, session_id, command, output, exit_code, duration_ms, executed_at
+		FROM command_history ORDER BY executed_at
+	`)
+	if err != nil {
+		return nil, fmt.Errorf("failed to export command history: %w", err)
+	}
+	defer cmdRows.Close()
+
+	for cmdRows.Next() {
+		var id, sessionID, command string
+		var output sql.NullString
+		var exitCode, durationMs int
+		var executedAt time.Time
+
+		if err := cmdRows.Scan(&id, &sessionID, &command, &output, &exitCode, &durationMs, &executedAt); err != nil {
+			return nil, err
+		}
+
+		cmd := map[string]interface{}{
+			"id":          id,
+			"session_id":  sessionID,
+			"command":     command,
+			"exit_code":   exitCode,
+			"duration_ms": durationMs,
+			"executed_at": executedAt.Format(time.RFC3339),
+		}
+		if output.Valid {
+			cmd["output"] = output.String
+		}
+		commands = append(commands, cmd)
+	}
+	export["command_history"] = commands
+
+	// Export agent plans (all sessions)
+	var plans []map[string]interface{}
+	planRows, err := s.db.Query(`
+		SELECT id, session_id, goal, status, current_task, created_at, updated_at
+		FROM agent_plans ORDER BY created_at
+	`)
+	if err != nil {
+		return nil, fmt.Errorf("failed to export agent plans: %w", err)
+	}
+	defer planRows.Close()
+
+	for planRows.Next() {
+		var id, sessionID, goal, status string
+		var currentTask int
+		var createdAt, updatedAt time.Time
+
+		if err := planRows.Scan(&id, &sessionID, &goal, &status, &currentTask, &createdAt, &updatedAt); err != nil {
+			return nil, err
+		}
+
+		plan := map[string]interface{}{
+			"id":           id,
+			"session_id":   sessionID,
+			"goal":         goal,
+			"status":       status,
+			"current_task": currentTask,
+			"created_at":   createdAt.Format(time.RFC3339),
+			"updated_at":   updatedAt.Format(time.RFC3339),
+		}
+		plans = append(plans, plan)
+	}
+	export["agent_plans"] = plans
+
+	// Add export metadata
+	export["_metadata"] = map[string]interface{}{
+		"exported_at": time.Now().Format(time.RFC3339),
+		"format":      "terminalizcrazy-gdpr-export-v1",
+	}
+
+	return export, nil
+}
+
+// DeleteAllUserData deletes all user data (GDPR right to erasure - Art. 17)
+func (s *Storage) DeleteAllUserData() error {
+	// Order matters due to foreign key constraints
+	tables := []string{
+		"agent_tasks",
+		"agent_plans",
+		"messages",
+		"command_history",
+		"sessions",
+		"workflows",
+		"workspaces",
+	}
+
+	for _, table := range tables {
+		if _, err := s.db.Exec("DELETE FROM " + table); err != nil {
+			return fmt.Errorf("failed to delete from %s: %w", table, err)
+		}
+	}
+
+	// Vacuum to reclaim space
+	if _, err := s.db.Exec("VACUUM"); err != nil {
+		return fmt.Errorf("failed to vacuum database: %w", err)
+	}
+
+	return nil
+}

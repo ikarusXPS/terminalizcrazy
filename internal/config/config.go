@@ -2,10 +2,12 @@ package config
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
 
 	"github.com/spf13/viper"
+	"github.com/terminalizcrazy/terminalizcrazy/internal/crypto"
 )
 
 // Config holds all application configuration
@@ -46,9 +48,24 @@ type Config struct {
 	// SecretGuard settings
 	SecretGuardEnabled bool `mapstructure:"secret_guard_enabled"`
 
+	// Data retention settings (GDPR compliance)
+	Retention RetentionConfig `mapstructure:"retention"`
+
 	// Debug settings
 	Debug    bool   `mapstructure:"debug"`
 	LogLevel string `mapstructure:"log_level"`
+}
+
+// RetentionConfig holds data retention policy settings
+type RetentionConfig struct {
+	// MessageRetentionDays is how long to keep chat messages (0 = forever)
+	MessageRetentionDays int `mapstructure:"message_retention_days"`
+	// CommandHistoryRetentionDays is how long to keep command history (0 = forever)
+	CommandHistoryRetentionDays int `mapstructure:"command_history_retention_days"`
+	// AgentPlanRetentionDays is how long to keep agent plans (0 = forever)
+	AgentPlanRetentionDays int `mapstructure:"agent_plan_retention_days"`
+	// AutoCleanupEnabled enables automatic cleanup on startup
+	AutoCleanupEnabled bool `mapstructure:"auto_cleanup_enabled"`
 }
 
 // AppearanceConfig holds appearance-related settings
@@ -124,6 +141,12 @@ func Load() (*Config, error) {
 	viper.SetDefault("workspace.restore_on_startup", true)
 	viper.SetDefault("workspace.max_workspaces", 10)
 
+	// Retention defaults (GDPR compliance)
+	viper.SetDefault("retention.message_retention_days", 90)          // 90 days default
+	viper.SetDefault("retention.command_history_retention_days", 90)  // 90 days default
+	viper.SetDefault("retention.agent_plan_retention_days", 30)       // 30 days default
+	viper.SetDefault("retention.auto_cleanup_enabled", true)          // Enabled by default
+
 	// Config file locations
 	home, err := os.UserHomeDir()
 	if err != nil {
@@ -180,7 +203,47 @@ func Load() (*Config, error) {
 		return nil, err
 	}
 
+	// Decrypt API keys if they are encrypted
+	if err := cfg.decryptAPIKeys(); err != nil {
+		return nil, fmt.Errorf("failed to decrypt API keys: %w", err)
+	}
+
 	return &cfg, nil
+}
+
+// decryptAPIKeys decrypts any encrypted API keys in the config
+func (c *Config) decryptAPIKeys() error {
+	km, err := crypto.NewKeyManager()
+	if err != nil {
+		return err
+	}
+
+	// Decrypt each API key if it's encrypted
+	if c.GeminiKey != "" {
+		decrypted, err := km.Decrypt(c.GeminiKey)
+		if err != nil {
+			return fmt.Errorf("gemini key: %w", err)
+		}
+		c.GeminiKey = decrypted
+	}
+
+	if c.AnthropicKey != "" {
+		decrypted, err := km.Decrypt(c.AnthropicKey)
+		if err != nil {
+			return fmt.Errorf("anthropic key: %w", err)
+		}
+		c.AnthropicKey = decrypted
+	}
+
+	if c.OpenAIKey != "" {
+		decrypted, err := km.Decrypt(c.OpenAIKey)
+		if err != nil {
+			return fmt.Errorf("openai key: %w", err)
+		}
+		c.OpenAIKey = decrypted
+	}
+
+	return nil
 }
 
 // HasAIKey returns true if at least one AI API key is configured
@@ -323,4 +386,52 @@ func (c *Config) GetInactiveOpacity() float64 {
 		return 1.0
 	}
 	return o
+}
+
+// GetMessageRetentionDays returns message retention period (0 = forever)
+func (c *Config) GetMessageRetentionDays() int {
+	if c.Retention.MessageRetentionDays < 0 {
+		return 0
+	}
+	return c.Retention.MessageRetentionDays
+}
+
+// GetCommandHistoryRetentionDays returns command history retention period (0 = forever)
+func (c *Config) GetCommandHistoryRetentionDays() int {
+	if c.Retention.CommandHistoryRetentionDays < 0 {
+		return 0
+	}
+	return c.Retention.CommandHistoryRetentionDays
+}
+
+// GetAgentPlanRetentionDays returns agent plan retention period (0 = forever)
+func (c *Config) GetAgentPlanRetentionDays() int {
+	if c.Retention.AgentPlanRetentionDays < 0 {
+		return 0
+	}
+	return c.Retention.AgentPlanRetentionDays
+}
+
+// IsAutoCleanupEnabled returns whether automatic data cleanup is enabled
+func (c *Config) IsAutoCleanupEnabled() bool {
+	return c.Retention.AutoCleanupEnabled
+}
+
+// EncryptAPIKey encrypts an API key for storage in config file
+func EncryptAPIKey(plaintext string) (string, error) {
+	if plaintext == "" {
+		return "", nil
+	}
+
+	km, err := crypto.NewKeyManager()
+	if err != nil {
+		return "", err
+	}
+
+	return km.Encrypt(plaintext)
+}
+
+// IsAPIKeyEncrypted checks if an API key value is encrypted
+func IsAPIKeyEncrypted(value string) bool {
+	return crypto.IsEncrypted(value)
 }
