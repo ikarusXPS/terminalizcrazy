@@ -5,6 +5,31 @@
 [![CI](https://github.com/ikarusXPS/terminalizcrazy/actions/workflows/ci.yml/badge.svg)](https://github.com/ikarusXPS/terminalizcrazy/actions/workflows/ci.yml)
 [![Go Report Card](https://goreportcard.com/badge/github.com/ikarusXPS/terminalizcrazy)](https://goreportcard.com/report/github.com/ikarusXPS/terminalizcrazy)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Go Version](https://img.shields.io/github/go-mod/go-version/ikarusXPS/terminalizcrazy)](https://go.dev/)
+[![Release](https://img.shields.io/github/v/release/ikarusXPS/terminalizcrazy)](https://github.com/ikarusXPS/terminalizcrazy/releases)
+[![Downloads](https://img.shields.io/github/downloads/ikarusXPS/terminalizcrazy/total)](https://github.com/ikarusXPS/terminalizcrazy/releases)
+
+```
++-------------------------------------------------------------+
+|  TerminalizCrazy v0.1.0   gemini   [abc123]                 |
++-------------------------------------------------------------+
+|                                                             |
+|  You: how to find large files?                              |
+|                                                             |
+|  AI: To find large files, use:                              |
+|     find . -size +100M -type f                              |
+|     This searches recursively for files over 100MB.         |
+|                                                             |
+|  $ find . -size +100M -type f                               |
+|    ./videos/movie.mp4 (1.2GB)                               |
+|    ./backup/archive.zip (500MB)                             |
+|                                                             |
++-------------------------------------------------------------+
+| > Ask anything...                                           |
++-------------------------------------------------------------+
+| Enter: Send | Ctrl+E: Execute | Ctrl+Y: Copy | Esc: Quit    |
++-------------------------------------------------------------+
+```
 
 TerminalizCrazy is a modern, feature-complete AI terminal built with Go and the Charm.sh ecosystem. It combines powerful AI capabilities with real-time collaboration, making terminal work more productive and collaborative.
 
@@ -29,6 +54,20 @@ TerminalizCrazy is a modern, feature-complete AI terminal built with Go and the 
 - **Share Codes** - Simple `xxxx-yyyy` format for joining
 
 ### Tabs, Splits & Workspaces
+
+```
++-------------------------+-------------------------+
+|  Chat                   |  Output                 |
++-------------------------+-------------------------+
+| You: git status         | $ git status            |
+|                         | On branch main          |
+| AI: Running...          | Changes not staged:     |
+|                         |   modified: app.go      |
++-------------------------+-------------------------+
+| Tab: Next | Ctrl+W: Close | Ctrl+\: Split         |
++-------------------------+-------------------------+
+```
+
 - **Multi-Pane Layout** - Horizontal and vertical splits
 - **Floating Panes** - Zellij-style floating windows
 - **5 Layout Presets** - quad, tall, wide, stack, single
@@ -212,21 +251,25 @@ See [config.toml.example](config.toml.example) for all options.
 Agent Mode enables autonomous multi-step task execution:
 
 ```
-> Set up a new React project with TypeScript and ESLint
-```
-
-Agent creates a plan:
-```
-Plan: React TypeScript Setup
-
-[1] npx create-react-app myapp --template typescript
-    Verification: myapp/ exists
-
-[2] cd myapp && npm install eslint --save-dev
-    Verification: eslint in package.json
-
-[3] npx eslint --init
-    Verification: .eslintrc.* exists
++-------------------------------------------------------------+
+| AI Agent Mode: Plan created                                 |
++-------------------------------------------------------------+
+|                                                             |
+|  Plan: React TypeScript Setup (3 Tasks)                     |
+|                                                             |
+|  [1] ... npx create-react-app myapp --template typescript   |
+|      Verification: myapp/ exists                            |
+|                                                             |
+|  [2] [ ] cd myapp && npm install eslint --save-dev          |
+|      Verification: eslint in package.json                   |
+|                                                             |
+|  [3] [ ] npx eslint --init                                  |
+|      Verification: .eslintrc.* exists                       |
+|                                                             |
+|  -----------------------------------------------------------+
+|  [A]pprove  [R]eject  [M]odify Task  [S]kip Task            |
+|                                                             |
++-------------------------------------------------------------+
 ```
 
 ### Modes
@@ -242,6 +285,23 @@ Plan: React TypeScript Setup
 ## Collaboration
 
 Share your terminal session in real-time:
+
+```
++-------------------------------------------------------------+
+|  TerminalizCrazy   Sharing: a1b2-c3d4 (2 users)             |
++-------------------------------------------------------------+
+|                                                             |
+|  Alice: Let me check the logs                               |
+|                                                             |
+|  Bob: Sure, try journalctl -f                               |
+|                                                             |
+|  $ journalctl -f                                            |
+|    [synced to all participants]                             |
+|                                                             |
++-------------------------------------------------------------+
+| E2E Encrypted | Ctrl+D: Disconnect                          |
++-------------------------------------------------------------+
+```
 
 **Host:**
 1. Press `Ctrl+S`
@@ -336,4 +396,13 @@ MIT License - see [LICENSE](LICENSE) for details.
 - [Contributing](CONTRIBUTING.md)
 - [Security Policy](SECURITY_CHECKLIST.md)
 
-Built with [Bubble Tea](https://github.com/charmbracelet/bubbletea) and [Charm.sh](https://charm.sh/)
+---
+
+## Made With
+
+Built with love using:
+
+- [Bubble Tea](https://github.com/charmbracelet/bubbletea) - TUI framework
+- [Lip Gloss](https://github.com/charmbracelet/lipgloss) - Styling
+- [Charm.sh](https://charm.sh/) - CLI ecosystem
+- [Go](https://go.dev/) - Programming language

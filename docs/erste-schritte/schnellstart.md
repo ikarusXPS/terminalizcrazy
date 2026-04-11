@@ -2,10 +2,24 @@
 
 > In 5 Minuten loslegen
 
+```
++-------------------------------------------------------------+
+|  TerminalizCrazy v0.1.0   gemini   [session-id]             |
++-------------------------------------------------------------+
+|                                                             |
+|  Willkommen! Stellen Sie Ihre erste Frage...                |
+|                                                             |
++-------------------------------------------------------------+
+| > _                                                         |
++-------------------------------------------------------------+
+| Enter: Senden | Ctrl+E: Ausfuehren | Esc: Beenden           |
++-------------------------------------------------------------+
+```
+
 ## Voraussetzungen
 
 - TerminalizCrazy installiert (siehe [Installation](installation.md))
-- API-Schluessel konfiguriert (ANTHROPIC_API_KEY, OPENAI_API_KEY, oder Ollama)
+- API-Schluessel konfiguriert (GEMINI_API_KEY, ANTHROPIC_API_KEY, OPENAI_API_KEY, oder Ollama)
 
 ---
 
@@ -27,6 +41,21 @@ Geben Sie eine Frage in natuerlicher Sprache ein:
 
     > Wie finde ich die groessten Dateien in diesem Ordner?
 
+```
++-------------------------------------------------------------+
+|  You: Wie finde ich die groessten Dateien?                  |
+|                                                             |
+|  AI: Hier ist der passende Befehl:                          |
+|                                                             |
+|     find . -type f -exec du -h {} + | sort -rh | head -20   |
+|                                                             |
+|     Dieser Befehl findet alle Dateien, sortiert sie nach    |
+|     Groesse und zeigt die 20 groessten an.                  |
+|                                                             |
+|  Press Ctrl+E to execute                                    |
++-------------------------------------------------------------+
+```
+
 TerminalizCrazy antwortet mit:
 - Dem passenden Terminal-Befehl
 - Einer kurzen Erklaerung
@@ -39,6 +68,17 @@ TerminalizCrazy antwortet mit:
 Druecken Sie **Ctrl+E** um den vorgeschlagenen Befehl auszufuehren.
 
 Bei riskanten Befehlen erscheint eine Bestaetigung:
+
+```
++-------------------------------------------------------------+
+|  MEDIUM: This command will modify files                     |
+|                                                             |
+|  find . -type f -exec du -h {} + | sort -rh | head -20      |
+|                                                             |
+|  Execute? [Y]es / [N]o                                      |
++-------------------------------------------------------------+
+```
+
 - Druecken Sie **Y** fuer Ja
 - Druecken Sie **N** fuer Nein
 
@@ -121,11 +161,24 @@ Sessions werden nach Projekt organisiert (basierend auf Ihrem Arbeitsverzeichnis
 
 Teilen Sie Ihre Session mit anderen:
 
+```
++-------------------------------------------------------------+
+|  Session teilen                                             |
+|                                                             |
+|  Share-Code: ABCD-1234                                      |
+|                                                             |
+|  Teilen Sie diesen Code mit anderen Teilnehmern.            |
+|  Sie koennen mit Ctrl+J beitreten.                          |
+|                                                             |
+|  [Verbunden: 2 Teilnehmer]                                  |
++-------------------------------------------------------------+
+```
+
 1. Druecken Sie **Ctrl+S** um zu teilen
 2. Ein Share-Code wird angezeigt (z.B. ABCD-1234)
 3. Andere druecken **Ctrl+J** und geben den Code ein
 
-Beide sehen alle Nachrichten und Befehle in Echtzeit.
+Beide sehen alle Nachrichten und Befehle in Echtzeit (E2E-verschluesselt).
 
 ---
 

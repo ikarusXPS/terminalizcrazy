@@ -1,30 +1,80 @@
-# Tutorial
+# Interaktives Tutorial
 
-> Schritt-fuer-Schritt Einfuehrung in TerminalizCrazy
+> Schritt-fuer-Schritt Einfuehrung in TerminalizCrazy (~12 Minuten)
 
-## Uebersicht
+## Inhaltsverzeichnis
 
-Dieses Tutorial fuehrt Sie durch alle wichtigen Funktionen von TerminalizCrazy. Am Ende werden Sie:
+| Schritt | Thema | Dauer |
+|---------|-------|-------|
+| 1 | [Installation pruefen](#schritt-1-installation-pruefen) | 2 min |
+| 2 | [Erster Start](#schritt-2-erster-start) | 1 min |
+| 3 | [Erste Frage stellen](#schritt-3-erste-frage-stellen) | 2 min |
+| 4 | [Befehl ausfuehren](#schritt-4-befehl-ausfuehren) | 1 min |
+| 5 | [Multi-Pane nutzen](#schritt-5-multi-pane-nutzen) | 2 min |
+| 6 | [Agent Mode ausprobieren](#schritt-6-agent-mode-ausprobieren) | 3 min |
+| 7 | [Theme wechseln](#schritt-7-theme-wechseln) | 1 min |
+
+## Lernziele
+
+Nach diesem Tutorial werden Sie:
 
 - KI-Befehlsvorschlaege verstehen und nutzen
 - Befehle sicher ausfuehren koennen
-- Die Historie effektiv nutzen
+- Multi-Pane Layouts effektiv einsetzen
+- Den Agent-Modus fuer komplexe Aufgaben nutzen
 - Sessions teilen und wiederherstellen
-- Den Agent-Modus kennen
-
-Dauer: ca. 15-20 Minuten
+- Themes anpassen
 
 ---
 
-## Schritt 1: Willkommen
+## Schritt 1: Installation pruefen
+
+Pruefen Sie, ob TerminalizCrazy korrekt installiert ist:
+
+```bash
+# API-Key pruefen (Gemini ist Standard)
+echo $GEMINI_API_KEY
+
+# Oder einen der anderen Provider
+echo $ANTHROPIC_API_KEY
+echo $OPENAI_API_KEY
+```
+
+Falls noch kein API-Key gesetzt ist:
+
+```bash
+# Gemini (kostenlos, empfohlen fuer den Start)
+export GEMINI_API_KEY="AIzaSy..."
+```
+
+---
+
+## Schritt 2: Erster Start
 
 Starten Sie TerminalizCrazy:
 
-    terminalizcrazy
+```bash
+terminalizcrazy
+```
+
+```
++-------------------------------------------------------------+
+|  TerminalizCrazy v0.1.0   gemini   [abc123]                 |
++-------------------------------------------------------------+
+|                                                             |
+|  Willkommen bei TerminalizCrazy!                            |
+|  Stellen Sie eine Frage in natuerlicher Sprache.            |
+|                                                             |
++-------------------------------------------------------------+
+| > _                                                         |
++-------------------------------------------------------------+
+| Enter: Senden | Ctrl+E: Ausfuehren | Ctrl+Y: Kopieren       |
++-------------------------------------------------------------+
+```
 
 Sie sehen:
 - Den Header mit Projektname und Version
-- KI-Status (gruen = verbunden)
+- KI-Provider und Status (gemini = verbunden)
 - Session-ID in eckigen Klammern
 - Eingabefeld am unteren Rand
 
@@ -32,7 +82,7 @@ Hilfreiche Tastenkuerzel werden in der Fusszeile angezeigt.
 
 ---
 
-## Schritt 2: Erste Anfrage
+## Schritt 3: Erste Frage stellen
 
 Stellen Sie Ihre erste Frage. Tippen Sie:
 
@@ -40,126 +90,162 @@ Stellen Sie Ihre erste Frage. Tippen Sie:
 
 Druecken Sie **Enter**.
 
-Die KI antwortet mit einem passenden Befehl, z.B.:
+```
++-------------------------------------------------------------+
+|  You: list files                                            |
+|                                                             |
+|  AI: Hier ist der Befehl zum Auflisten von Dateien:         |
+|                                                             |
+|     ls -la                                                  |
+|                                                             |
+|     -l zeigt Details (Rechte, Groesse, Datum)               |
+|     -a zeigt auch versteckte Dateien                        |
+|                                                             |
+|  Press Ctrl+E to execute                                    |
++-------------------------------------------------------------+
+```
 
-    ls -la
-
-Unter dem Befehl steht: "Press Ctrl+E to execute"
+Die KI antwortet mit einem passenden Befehl und Erklaerung.
 
 ---
 
-## Schritt 3: Befehl ausfuehren
+## Schritt 4: Befehl ausfuehren
 
 Druecken Sie **Ctrl+E** um den vorgeschlagenen Befehl auszufuehren.
 
-Da ls ein sicherer Befehl ist, wird er sofort ausgefuehrt.
+Da `ls` ein sicherer Befehl ist (Risikostufe: LOW), wird er sofort ausgefuehrt:
 
-Das Ergebnis erscheint im Chat mit Zeitstempel.
+```
++-------------------------------------------------------------+
+|  $ ls -la                                                   |
+|  total 64                                                   |
+|  drwxr-xr-x  8 user  staff   256 Apr 11 10:30 .             |
+|  drwxr-xr-x  5 user  staff   160 Apr 10 09:15 ..            |
+|  -rw-r--r--  1 user  staff  1234 Apr 11 10:30 main.go       |
+|  -rw-r--r--  1 user  staff   567 Apr 11 10:25 go.mod        |
+|                                                             |
+|  [Exit code: 0]                                             |
++-------------------------------------------------------------+
+```
 
----
-
-## Schritt 4: Riskante Befehle
-
-Fragen Sie nach einem riskanteren Befehl:
-
-    delete all .log files
-
-Die KI schlaegt vor:
-
-    rm -f *.log
-
-Druecken Sie **Ctrl+E**.
-
-Jetzt erscheint ein Bestaetigungsdialog:
-
-    HIGH: This command will delete or destroy data
-    
-    rm -f *.log
-    
-    Execute? [Y]es / [N]o
-
-- Druecken Sie **Y** um auszufuehren
-- Druecken Sie **N** oder **Esc** um abzubrechen
-
-Fuer dieses Tutorial: Druecken Sie **N**.
+Das Ergebnis erscheint im Chat mit Exit-Code.
 
 ---
 
-## Schritt 5: Historie nutzen
+## Schritt 5: Multi-Pane nutzen
 
-Druecken Sie die **Pfeiltaste nach oben**.
+TerminalizCrazy unterstuetzt mehrere Panes gleichzeitig.
 
-Ihre vorherige Eingabe "list files" erscheint.
+### Pane teilen
 
-Druecken Sie erneut nach oben fuer aeltere Eingaben.
+Druecken Sie **Ctrl+\\** fuer einen vertikalen Split:
 
-Mit **Pfeiltaste nach unten** gehen Sie wieder vorwaerts.
+```
++-------------------------+-------------------------+
+|  Chat                   |  Neuer Pane             |
++-------------------------+-------------------------+
+| You: list files         |                         |
+|                         | > _                     |
+| AI: ls -la              |                         |
++-------------------------+-------------------------+
+```
 
-Druecken Sie **Esc** um die Historie-Navigation zu beenden.
+Oder **Ctrl+-** fuer einen horizontalen Split.
 
----
+### Zwischen Panes wechseln
 
-## Schritt 6: Clipboard verwenden
+- **Alt+Pfeiltasten**: Navigieren zwischen Panes
+- **Ctrl+Z**: Pane zoomen (Vollbild)
+- **Ctrl+W**: Aktuellen Pane schliessen
 
-Druecken Sie **Ctrl+Y**.
+### Layout-Presets
 
-Der letzte vorgeschlagene Befehl wird ins System-Clipboard kopiert.
+Starten Sie mit einem vorgefertigten Layout:
 
-Eine Bestaetigung erscheint: "Copied to clipboard: rm -f *.log"
-
-Sie koennen den Befehl nun in andere Anwendungen einfuegen.
-
----
-
-## Schritt 7: Session teilen (optional)
-
-Wenn Sie mit anderen zusammenarbeiten moechten:
-
-1. Druecken Sie **Ctrl+S**
-2. Ein Share-Code wird angezeigt (z.B. abcd-1234)
-3. Teilen Sie diesen Code mit anderen
-
-Andere Teilnehmer:
-1. Druecken **Ctrl+J**
-2. Geben den Code ein
-3. Sehen alle Nachrichten in Echtzeit
-
-Druecken Sie **Ctrl+D** um die Zusammenarbeit zu beenden.
+```bash
+terminalizcrazy --layout quad     # 4 Panes
+terminalizcrazy --layout tall     # 2 Panes vertikal
+terminalizcrazy --layout wide     # 2 Panes horizontal
+```
 
 ---
 
-## Schritt 8: Letzten Befehl anzeigen
+## Schritt 6: Agent Mode ausprobieren
 
-Druecken Sie **Ctrl+R**.
+Der Agent Mode plant und fuehrt komplexe Aufgaben automatisch aus.
 
-Der letzte vorgeschlagene Befehl wird im Chat angezeigt, ohne ihn auszufuehren.
+### Agent Mode aktivieren
 
-Nuetzlich wenn Sie den Befehl nach laengerer Unterhaltung wiederfinden moechten.
+Druecken Sie **Ctrl+A** um den Modus zu wechseln:
+- `off` -> `suggest` -> `auto` -> `off`
+
+Empfohlen: `suggest` (plant, fragt vor Ausfuehrung)
+
+### Komplexe Aufgabe stellen
+
+```
+> Set up a new React project with TypeScript and ESLint
+```
+
+Der Agent erstellt einen Plan:
+
+```
++-------------------------------------------------------------+
+| Agent Mode: Plan erstellt                                   |
++-------------------------------------------------------------+
+|                                                             |
+|  Plan: React TypeScript Setup (3 Tasks)                     |
+|                                                             |
+|  [1] ... npx create-react-app myapp --template typescript   |
+|      Verification: myapp/ exists                            |
+|                                                             |
+|  [2] [ ] cd myapp && npm install eslint --save-dev          |
+|      Verification: eslint in package.json                   |
+|                                                             |
+|  [3] [ ] npx eslint --init                                  |
+|      Verification: .eslintrc.* exists                       |
+|                                                             |
++-------------------------------------------------------------+
+| [A]pprove  [R]eject  [M]odify  [S]kip                       |
++-------------------------------------------------------------+
+```
+
+- **A**: Plan genehmigen und ausfuehren
+- **R**: Plan ablehnen
+- **M**: Einzelne Tasks anpassen
+- **S**: Task ueberspringen
 
 ---
 
-## Schritt 9: Chat leeren
+## Schritt 7: Theme wechseln
 
-Druecken Sie **Ctrl+L**.
+TerminalizCrazy bietet 5 eingebaute Themes.
 
-Der Chat-Verlauf wird geleert.
+### Theme in config.toml setzen
 
-Die Session bleibt erhalten, nur die Anzeige wird zurueckgesetzt.
+```toml
+# ~/.terminalizcrazy/config.toml
+theme = "dracula"   # default, dracula, monokai, nord, solarized
+```
 
----
+### Verfuegbare Themes
 
-## Schritt 10: Session wechseln
+| Theme | Beschreibung |
+|-------|--------------|
+| `default` | Standard-Farben |
+| `dracula` | Dunkles Theme mit Lila-Akzenten |
+| `monokai` | Klassisches Entwickler-Theme |
+| `nord` | Nordische Farbpalette |
+| `solarized` | Augenfreundliche Farben |
 
-Beenden Sie mit **Esc** und starten Sie neu:
+### Hot Reload
 
-    terminalizcrazy
+Themes werden automatisch neu geladen wenn die Datei geaendert wird:
 
-Beim Start sehen Sie die Session-Auswahl:
-- Pfeil hoch/runter zum Navigieren
-- Enter zum Auswaehlen
-- N fuer neue Session
-
-Waehlen Sie Ihre vorherige Session, um den Verlauf wiederherzustellen.
+```toml
+[appearance]
+theme_hot_reload = true
+```
 
 ---
 
@@ -167,18 +253,35 @@ Waehlen Sie Ihre vorherige Session, um den Verlauf wiederherzustellen.
 
 Sie haben gelernt:
 
+### Grundlagen
+
 | Taste | Aktion |
 |-------|--------|
 | Enter | Nachricht senden |
 | Ctrl+E | Befehl ausfuehren |
 | Ctrl+Y | Befehl kopieren |
-| Ctrl+R | Letzten Befehl anzeigen |
-| Ctrl+L | Chat leeren |
+| Pfeil hoch/runter | Historie durchsuchen |
+| Esc | Beenden |
+
+### Panes & Layouts
+
+| Taste | Aktion |
+|-------|--------|
+| Ctrl+\\ | Vertikaler Split |
+| Ctrl+- | Horizontaler Split |
+| Alt+Pfeiltasten | Zwischen Panes wechseln |
+| Ctrl+Z | Pane zoomen |
+| Ctrl+W | Pane schliessen |
+
+### Agent & Collaboration
+
+| Taste | Aktion |
+|-------|--------|
+| Ctrl+A | Agent Mode umschalten |
+| Ctrl+M | Model Selector oeffnen |
 | Ctrl+S | Session teilen |
 | Ctrl+J | Session beitreten |
 | Ctrl+D | Zusammenarbeit beenden |
-| Pfeil hoch/runter | Historie durchsuchen |
-| Esc | Beenden |
 
 ---
 
@@ -189,7 +292,7 @@ Jetzt sind Sie bereit fuer fortgeschrittene Funktionen:
 - [Agent-Modus](../anleitungen/agent-modus.md) - Komplexe Aufgaben automatisieren
 - [Workflows](../anleitungen/workflows.md) - Wiederkehrende Aufgaben speichern
 - [Zusammenarbeit](../anleitungen/zusammenarbeit.md) - Team-Features
-- [Einstellungen](../referenz/einstellungen.md) - Anpassungsmoeglichkeiten
+- [Einstellungen](../referenz/einstellungen.md) - Alle Konfigurationsoptionen
 
 ---
 
@@ -197,8 +300,10 @@ Jetzt sind Sie bereit fuer fortgeschrittene Funktionen:
 
 ### Praezise Fragen stellen
 
+```
 Schlecht: "mache etwas mit dateien"
-Gut: "zeige alle Python-Dateien groesser als 1MB"
+Gut:      "zeige alle Python-Dateien groesser als 1MB"
+```
 
 ### Kontext nutzen
 
@@ -206,13 +311,24 @@ TerminalizCrazy erkennt Ihr Projekt automatisch:
 - In einem Git-Repo: Git-spezifische Vorschlaege
 - In einem Node.js-Projekt: npm-Befehle
 - In einem Python-Projekt: pip/python-Befehle
+- In einem Go-Projekt: go-Befehle
 
 ### Bei Unsicherheit: Nachfragen
 
-    > Was macht der Befehl "tar -xvzf archive.tar.gz"?
+```
+> Was macht der Befehl "tar -xvzf archive.tar.gz"?
+```
 
 Die KI erklaert jeden Teil des Befehls.
 
+### Model wechseln
+
+Druecken Sie **Ctrl+M** um zwischen KI-Modellen zu wechseln:
+- Gemini Flash (schnell, kosteneffizient)
+- Gemini Pro (leistungsfaehiger)
+- Claude (Anthropic)
+- GPT-4 (OpenAI)
+
 ---
 
-*Viel Erfolg mit TerminalizCrazy\!*
+*Viel Erfolg mit TerminalizCrazy!*

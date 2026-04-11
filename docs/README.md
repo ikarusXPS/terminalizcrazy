@@ -2,6 +2,15 @@
 
 > KI-gestütztes Terminal für intelligente Befehlsausführung
 
+```
++-------------------------------------------------------------+
+|  TerminalizCrazy v0.1.0   gemini   [session]                |
++-------------------------------------------------------------+
+|  KI-native Terminal mit Agent Mode, Collaboration,          |
+|  SecretGuard und Multi-Provider Support                     |
++-------------------------------------------------------------+
+```
+
 ## Schnellnavigation
 
 ### Erste Schritte
@@ -10,7 +19,7 @@
 |----------|--------------|
 | [Installation](erste-schritte/installation.md) | System-Anforderungen und Installation |
 | [Schnellstart](erste-schritte/schnellstart.md) | In 5 Minuten loslegen |
-| [Tutorial](erste-schritte/tutorial.md) | Interaktives Einführungs-Tutorial |
+| [Tutorial](erste-schritte/tutorial.md) | Interaktives Tutorial (~12 Minuten) |
 
 ### Anleitungen
 
@@ -47,13 +56,15 @@ TerminalizCrazy ist ein **KI-natives Terminal**, das natürliche Sprache in Term
 
 ### Hauptfunktionen
 
-- **KI-Befehlsvorschläge** - Beschreiben Sie Ihr Ziel, erhalten Sie den passenden Befehl
-- **Agent-Modus** - Automatische Planung und Ausführung komplexer Aufgaben
-- **Risikobewertung** - Warnung vor gefährlichen Befehlen
-- **Secret Guard** - Automatische Maskierung von API-Keys und Passwörtern
+- **Multi-Provider Support** - Gemini (Standard), Claude, GPT, Ollama
+- **Agent-Modus** - Automatische Planung und Ausführung komplexer Aufgaben (Ctrl+A)
+- **Live Model-Wechsel** - KI-Modell ohne Neustart wechseln (Ctrl+M)
+- **Risikobewertung** - Warnung vor gefährlichen Befehlen (4 Stufen)
+- **Secret Guard** - Automatische Maskierung von 7 Secret-Typen
+- **Multi-Pane Layouts** - Horizontale/vertikale Splits, 5 Layout-Presets
 - **Session-Persistenz** - Alle Gespräche werden gespeichert
-- **Projekt-Erkennung** - Kontextbezogene Vorschläge basierend auf Ihrem Projekt
-- **Zusammenarbeit** - Sessions in Echtzeit teilen
+- **Projekt-Erkennung** - 11 Projekttypen mit Framework-Erkennung
+- **Zusammenarbeit** - E2E-verschlüsselte Sessions in Echtzeit teilen
 
 ### Beispiel
 
@@ -71,11 +82,15 @@ TerminalizCrazy: Hier ist der Befehl:
 ## Schnellstart
 
 ```bash
-# 1. API-Key setzen
-export ANTHROPIC_API_KEY="sk-ant-api03-xxx"
+# 1. API-Key setzen (Gemini ist Standard)
+export GEMINI_API_KEY="AIzaSy..."
+
+# Oder alternativ:
+# export ANTHROPIC_API_KEY="sk-ant-api03-xxx"
+# export OPENAI_API_KEY="sk-..."
 
 # 2. Starten
-./terminalizcrazy
+terminalizcrazy
 
 # 3. Fragen stellen
 > wie erstelle ich ein neues git repository?
