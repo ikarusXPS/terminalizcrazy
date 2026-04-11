@@ -198,27 +198,54 @@ func extractExplanation(content string) string {
 	return ""
 }
 
-// CompleteStream sends a streaming request to Anthropic
-// Note: Falls back to non-streaming if stream API is unavailable
+// CompleteStream sends a streaming request to Anthropic with real-time token streaming
 func (c *AnthropicClient) CompleteStream(ctx context.Context, req *Request, handler func(StreamingResponse)) error {
-	// Use the standard Complete method and simulate streaming
-	// This is a fallback approach; real streaming would require library support
-	resp, err := c.Complete(ctx, req)
-	if err != nil {
-		return err
+	systemPrompt := buildSystemPrompt(req)
+	userMessage := buildUserMessage(req)
+
+	var fullText strings.Builder
+
+	streamReq := anthropic.MessagesStreamRequest{
+		MessagesRequest: anthropic.MessagesRequest{
+			Model:       anthropic.ModelClaude3Dot5Sonnet20241022,
+			MultiSystem: anthropic.NewMultiSystemMessages(systemPrompt),
+			Messages: []anthropic.Message{
+				anthropic.NewUserTextMessage(userMessage),
+			},
+			MaxTokens: 1024,
+		},
+		OnContentBlockDelta: func(data anthropic.MessagesEventContentBlockDeltaData) {
+			if data.Delta.Type == "text_delta" {
+				text := data.Delta.GetText()
+				fullText.WriteString(text)
+				handler(StreamingResponse{
+					Delta:    text,
+					Done:     false,
+					FullText: fullText.String(),
+				})
+			}
+		},
+		OnError: func(err anthropic.ErrorResponse) {
+			handler(StreamingResponse{
+				Done: true,
+				Err:  fmt.Errorf("stream error: %s", err.Error.Message),
+			})
+		},
 	}
 
-	// Send the complete response as a single chunk
-	handler(StreamingResponse{
-		Delta:    resp.Content,
-		Done:     false,
-		FullText: resp.Content,
-	})
+	_, err := c.client.CreateMessagesStream(ctx, streamReq)
+	if err != nil {
+		return fmt.Errorf("anthropic stream error: %w", err)
+	}
+
+	// Final message with extracted command
+	finalText := fullText.String()
+	command := extractCommand(finalText)
 
 	handler(StreamingResponse{
 		Done:     true,
-		Command:  resp.Command,
-		FullText: resp.Content,
+		Command:  command,
+		FullText: finalText,
 	})
 
 	return nil

@@ -462,14 +462,25 @@ func (m *Model) startSharing() tea.Cmd {
 
 		// Start local server
 		port := 8765
-		m.collabServer = collab.NewServer(port)
+		server := collab.NewServer(port)
+		m.collabServer = server
 
 		errCh := make(chan error, 1)
 		go func() {
-			if err := m.collabServer.Start(); err != nil {
-				errCh <- err
+			if err := server.Start(); err != nil {
+				// Only send error if it's not a normal shutdown
+				if err != http.ErrServerClosed {
+					errCh <- err
+				}
 			}
 		}()
+
+		// Helper to cleanup server on error
+		cleanup := func() {
+			if server != nil {
+				_ = server.Stop()
+			}
+		}
 
 		// Wait for server to be ready by checking health endpoint
 		serverReady := false
@@ -477,8 +488,10 @@ func (m *Model) startSharing() tea.Cmd {
 		for i := 0; i < 50; i++ { // 50 attempts * 100ms = 5 seconds max
 			select {
 			case err := <-errCh:
+				cleanup()
 				return collabErrorMsg{err: fmt.Errorf("server start failed: %w", err)}
 			case <-ctx.Done():
+				cleanup()
 				return collabErrorMsg{err: fmt.Errorf("server start timeout")}
 			default:
 				// Try to reach health endpoint
@@ -493,6 +506,7 @@ func (m *Model) startSharing() tea.Cmd {
 		}
 
 		if !serverReady {
+			cleanup()
 			return collabErrorMsg{err: fmt.Errorf("server failed to become ready")}
 		}
 
@@ -509,6 +523,7 @@ func (m *Model) startSharing() tea.Cmd {
 
 		shareCode, err := m.collabClient.CreateRoom(m.sessionID, userName)
 		if err != nil {
+			cleanup()
 			return collabErrorMsg{err: err}
 		}
 
@@ -736,9 +751,27 @@ func (m Model) handleModelSelectKeyMsg(msg tea.KeyMsg) (Model, tea.Cmd) {
 		if len(m.availableModels) > 0 && m.modelIndex < len(m.availableModels) {
 			selectedModel := m.availableModels[m.modelIndex]
 			m.viewMode = ViewChat
-			m.addSystemMessage(fmt.Sprintf("Model selected: %s (Note: Model switching requires restart)", selectedModel))
-			// Store selection for future use
-			m.config.OllamaModel = selectedModel
+
+			// Update model in config and try to switch
+			if m.aiService != nil {
+				provider := m.aiService.GetProvider()
+				switch provider {
+				case ai.ProviderGemini:
+					m.config.GeminiModel = selectedModel
+					if geminiClient, ok := m.aiService.GetClient().(*ai.GeminiClient); ok {
+						geminiClient.SetModel(selectedModel)
+						m.addSystemMessage(fmt.Sprintf("Switched to model: %s", selectedModel))
+					}
+				case ai.ProviderOllama:
+					m.config.OllamaModel = selectedModel
+					if ollamaClient, ok := m.aiService.GetClient().(*ai.OllamaClient); ok {
+						ollamaClient.SetModel(selectedModel)
+						m.addSystemMessage(fmt.Sprintf("Switched to model: %s", selectedModel))
+					}
+				default:
+					m.addSystemMessage(fmt.Sprintf("Model selected: %s (restart required for this provider)", selectedModel))
+				}
+			}
 		}
 		return m, nil
 	}

@@ -84,10 +84,11 @@ type Client interface {
 
 // StreamingResponse represents a chunk of a streaming response
 type StreamingResponse struct {
-	Delta      string  // The new text chunk
-	Done       bool    // Whether streaming is complete
-	Command    string  // Extracted command (only set when Done)
-	FullText   string  // Full accumulated text (only set when Done)
+	Delta    string // The new text chunk
+	Done     bool   // Whether streaming is complete
+	Command  string // Extracted command (only set when Done)
+	FullText string // Full accumulated text (only set when Done)
+	Err      error  // Error that occurred during streaming
 }
 
 // StreamingClient extends Client with streaming support
