@@ -291,7 +291,7 @@ func (c *Config) GetOllamaURL() string {
 // GetOllamaModel returns the Ollama model with default fallback
 func (c *Config) GetOllamaModel() string {
 	if c.OllamaModel == "" {
-		return "codellama"
+		return "gemma4"
 	}
 	return c.OllamaModel
 }

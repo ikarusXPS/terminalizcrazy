@@ -23,7 +23,7 @@ func TestLoad(t *testing.T) {
 	assert.NotNil(t, cfg)
 
 	// Check defaults
-	assert.Equal(t, "gemini", cfg.AIProvider)
+	assert.Equal(t, "ollama", cfg.AIProvider)
 	assert.Equal(t, "default", cfg.Theme)
 	assert.True(t, cfg.ShowWelcome)
 	assert.Equal(t, 1000, cfg.HistoryLimit)
@@ -39,8 +39,8 @@ func TestLoadDefaults_Ollama(t *testing.T) {
 
 	require.NoError(t, err)
 	assert.Equal(t, "http://localhost:11434", cfg.OllamaURL)
-	assert.Equal(t, "codellama", cfg.OllamaModel)
-	assert.False(t, cfg.OllamaEnabled)
+	assert.Equal(t, "gemma4", cfg.OllamaModel)
+	assert.True(t, cfg.OllamaEnabled)
 }
 
 func TestLoadDefaults_Agent(t *testing.T) {
@@ -307,7 +307,7 @@ func TestConfig_GetOllamaModel(t *testing.T) {
 		{
 			name:  "empty model returns default",
 			model: "",
-			want:  "codellama",
+			want:  "gemma4",
 		},
 	}
 

@@ -67,7 +67,7 @@ Optional: Modell aendern (Standard: gemini-1.5-flash):
        export ANTHROPIC_API_KEY="sk-ant-api03-xxx"
        export AI_PROVIDER="anthropic"
 
-### OpenAI
+### OpenAI (Einrichtung)
 
 1. Account erstellen: platform.openai.com
 2. API Key generieren
