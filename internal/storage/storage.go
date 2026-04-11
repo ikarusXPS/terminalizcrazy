@@ -442,25 +442,30 @@ func (s *Storage) ClearCommandHistory() error {
 // GetStats returns storage statistics
 func (s *Storage) GetStats() (map[string]int64, error) {
 	stats := make(map[string]int64)
+	var errs []error
 
-	var count int64
+	tables := []struct {
+		query string
+		key   string
+	}{
+		{"SELECT COUNT(*) FROM sessions", "sessions"},
+		{"SELECT COUNT(*) FROM messages", "messages"},
+		{"SELECT COUNT(*) FROM command_history", "commands"},
+		{"SELECT COUNT(*) FROM agent_plans", "plans"},
+	}
 
-	// Sessions count
-	s.db.QueryRow("SELECT COUNT(*) FROM sessions").Scan(&count)
-	stats["sessions"] = count
+	for _, t := range tables {
+		var count int64
+		if err := s.db.QueryRow(t.query).Scan(&count); err != nil {
+			errs = append(errs, fmt.Errorf("%s: %w", t.key, err))
+			continue
+		}
+		stats[t.key] = count
+	}
 
-	// Messages count
-	s.db.QueryRow("SELECT COUNT(*) FROM messages").Scan(&count)
-	stats["messages"] = count
-
-	// Commands count
-	s.db.QueryRow("SELECT COUNT(*) FROM command_history").Scan(&count)
-	stats["commands"] = count
-
-	// Plans count
-	s.db.QueryRow("SELECT COUNT(*) FROM agent_plans").Scan(&count)
-	stats["plans"] = count
-
+	if len(errs) > 0 {
+		return stats, fmt.Errorf("stats errors: %v", errs)
+	}
 	return stats, nil
 }
 

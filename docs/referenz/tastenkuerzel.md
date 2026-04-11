@@ -36,6 +36,13 @@ TerminalizCrazy verwendet intuitive Tastenkürzel für effiziente Navigation und
 | `Esc` | Beenden | Anwendung beenden |
 | `Ctrl+C` | Abbrechen | Laufende Operation abbrechen / Anwendung beenden |
 
+### KI-Steuerung
+
+| Taste | Aktion | Beschreibung |
+|-------|--------|--------------|
+| `Ctrl+A` | Agent-Modus | Agent-Modus umschalten (off → suggest → auto) |
+| `Ctrl+M` | Modell-Auswahl | KI-Modell wechseln |
+
 ---
 
 ## Zusammenarbeit
@@ -124,6 +131,8 @@ Bei Befehlen mit erhöhtem Risiko erscheint ein Bestätigungsdialog:
 ```
 Ctrl+E    Befehl ausführen
 Ctrl+Y    Befehl kopieren
+Ctrl+A    Agent-Modus umschalten
+Ctrl+M    Modell-Auswahl
 Ctrl+S    Session teilen
 Ctrl+J    Session beitreten
 Ctrl+L    Chat leeren

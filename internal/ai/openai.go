@@ -2,7 +2,10 @@ package ai
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"io"
+	"strings"
 
 	"github.com/sashabaranov/go-openai"
 )
@@ -54,4 +57,63 @@ func (c *OpenAIClient) Complete(ctx context.Context, req *Request) (*Response, e
 
 	content := resp.Choices[0].Message.Content
 	return parseResponse(content, req.Type, ProviderOpenAI), nil
+}
+
+// CompleteStream sends a streaming request to OpenAI
+func (c *OpenAIClient) CompleteStream(ctx context.Context, req *Request, handler func(StreamingResponse)) error {
+	systemPrompt := buildSystemPrompt(req)
+	userMessage := buildUserMessage(req)
+
+	stream, err := c.client.CreateChatCompletionStream(ctx, openai.ChatCompletionRequest{
+		Model: openai.GPT4oMini,
+		Messages: []openai.ChatCompletionMessage{
+			{
+				Role:    openai.ChatMessageRoleSystem,
+				Content: systemPrompt,
+			},
+			{
+				Role:    openai.ChatMessageRoleUser,
+				Content: userMessage,
+			},
+		},
+		MaxTokens:   1024,
+		Temperature: 0.7,
+		Stream:      true,
+	})
+
+	if err != nil {
+		return fmt.Errorf("openai stream error: %w", err)
+	}
+	defer stream.Close()
+
+	var fullText strings.Builder
+
+	for {
+		response, err := stream.Recv()
+		if errors.Is(err, io.EOF) {
+			// Stream completed
+			finalText := fullText.String()
+			handler(StreamingResponse{
+				Done:     true,
+				Command:  extractCommand(finalText),
+				FullText: finalText,
+			})
+			return nil
+		}
+
+		if err != nil {
+			return fmt.Errorf("stream recv error: %w", err)
+		}
+
+		if len(response.Choices) > 0 {
+			delta := response.Choices[0].Delta.Content
+			if delta != "" {
+				fullText.WriteString(delta)
+				handler(StreamingResponse{
+					Delta: delta,
+					Done:  false,
+				})
+			}
+		}
+	}
 }

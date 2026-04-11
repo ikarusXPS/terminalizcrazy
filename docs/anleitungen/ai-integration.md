@@ -10,7 +10,15 @@ TerminalizCrazy integriert verschiedene KI-Anbieter fuer intelligente Befehlsvor
 
 ## Unterstuetzte Anbieter
 
-### Anthropic (Claude) - empfohlen
+### Google Gemini - Standard
+
+| Eigenschaft | Wert |
+|-------------|------|
+| Modell | Gemini 1.5 Flash (Standard), Gemini 1.5 Pro |
+| Staerken | Schnell, kosteneffizient, gutes Code-Verstaendnis |
+| Setup | GEMINI_API_KEY |
+
+### Anthropic (Claude)
 
 | Eigenschaft | Wert |
 |-------------|------|
@@ -38,13 +46,26 @@ TerminalizCrazy integriert verschiedene KI-Anbieter fuer intelligente Befehlsvor
 
 ## Anbieter einrichten
 
+### Google Gemini (Standard)
+
+1. Account erstellen: aistudio.google.com
+2. API Key generieren
+3. Umgebungsvariable setzen:
+
+       export GEMINI_API_KEY="AIzaSyxxxxx"
+
+Optional: Modell aendern (Standard: gemini-1.5-flash):
+
+       export GEMINI_MODEL="gemini-1.5-pro"
+
 ### Anthropic
 
 1. Account erstellen: console.anthropic.com
 2. API Key generieren
-3. Umgebungsvariable setzen:
+3. Umgebungsvariablen setzen:
 
        export ANTHROPIC_API_KEY="sk-ant-api03-xxx"
+       export AI_PROVIDER="anthropic"
 
 ### OpenAI
 

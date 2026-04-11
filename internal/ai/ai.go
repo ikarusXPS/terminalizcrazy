@@ -14,6 +14,7 @@ type Provider string
 const (
 	ProviderAnthropic Provider = "anthropic"
 	ProviderOpenAI    Provider = "openai"
+	// ProviderGemini is defined in gemini.go
 	// ProviderOllama is defined in ollama.go
 )
 
@@ -81,6 +82,22 @@ type Client interface {
 	Provider() Provider
 }
 
+// StreamingResponse represents a chunk of a streaming response
+type StreamingResponse struct {
+	Delta      string  // The new text chunk
+	Done       bool    // Whether streaming is complete
+	Command    string  // Extracted command (only set when Done)
+	FullText   string  // Full accumulated text (only set when Done)
+}
+
+// StreamingClient extends Client with streaming support
+type StreamingClient interface {
+	Client
+
+	// CompleteStream sends a request and streams the response
+	CompleteStream(ctx context.Context, req *Request, handler func(StreamingResponse)) error
+}
+
 // Service manages AI interactions
 type Service struct {
 	client   Client
@@ -98,6 +115,8 @@ func NewService(provider Provider, apiKey string) (*Service, error) {
 	var err error
 
 	switch provider {
+	case ProviderGemini:
+		client, err = NewGeminiClient(apiKey)
 	case ProviderAnthropic:
 		client, err = NewAnthropicClient(apiKey)
 	case ProviderOpenAI:
@@ -115,6 +134,19 @@ func NewService(provider Provider, apiKey string) (*Service, error) {
 	return &Service{
 		client:   client,
 		provider: provider,
+	}, nil
+}
+
+// NewServiceWithGemini creates an AI service with custom Gemini model
+func NewServiceWithGemini(apiKey, model string) (*Service, error) {
+	client, err := NewGeminiClientWithModel(apiKey, model)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Service{
+		client:   client,
+		provider: ProviderGemini,
 	}, nil
 }
 
@@ -233,4 +265,34 @@ func getRequestContext() *RequestContext {
 // GetProvider returns the current provider
 func (s *Service) GetProvider() Provider {
 	return s.provider
+}
+
+// GetClient returns the underlying AI client
+func (s *Service) GetClient() Client {
+	return s.client
+}
+
+// SupportsStreaming returns true if the current provider supports streaming
+func (s *Service) SupportsStreaming() bool {
+	_, ok := s.client.(StreamingClient)
+	return ok
+}
+
+// ProcessInputStreaming processes user input with streaming response
+func (s *Service) ProcessInputStreaming(ctx context.Context, input string, handler func(StreamingResponse)) error {
+	streamClient, ok := s.client.(StreamingClient)
+	if !ok {
+		return fmt.Errorf("streaming not supported by provider %s", s.provider)
+	}
+
+	reqType := detectRequestType(input)
+	reqContext := getRequestContext()
+
+	req := &Request{
+		UserMessage: input,
+		Context:     reqContext,
+		Type:        reqType,
+	}
+
+	return streamClient.CompleteStream(ctx, req, handler)
 }

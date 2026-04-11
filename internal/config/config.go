@@ -14,6 +14,8 @@ type Config struct {
 	AIProvider    string `mapstructure:"ai_provider"`
 	AnthropicKey  string `mapstructure:"anthropic_api_key"`
 	OpenAIKey     string `mapstructure:"openai_api_key"`
+	GeminiKey     string `mapstructure:"gemini_api_key"`
+	GeminiModel   string `mapstructure:"gemini_model"` // Default: gemini-1.5-flash
 
 	// Ollama settings
 	OllamaURL     string `mapstructure:"ollama_url"`
@@ -81,7 +83,8 @@ type WorkspaceConfig struct {
 // Load reads configuration from file and environment
 func Load() (*Config, error) {
 	// Set defaults
-	viper.SetDefault("ai_provider", "anthropic")
+	viper.SetDefault("ai_provider", "gemini") // Default to Gemini
+	viper.SetDefault("gemini_model", "gemini-1.5-flash") // Default Gemini model
 	viper.SetDefault("theme", "default")
 	viper.SetDefault("show_welcome", true)
 	viper.SetDefault("history_limit", 1000)
@@ -154,6 +157,8 @@ func Load() (*Config, error) {
 	viper.AutomaticEnv()
 
 	// Also read from .env file style (without prefix)
+	viper.BindEnv("gemini_api_key", "GEMINI_API_KEY")
+	viper.BindEnv("gemini_model", "GEMINI_MODEL")
 	viper.BindEnv("anthropic_api_key", "ANTHROPIC_API_KEY")
 	viper.BindEnv("openai_api_key", "OPENAI_API_KEY")
 	viper.BindEnv("ai_provider", "AI_PROVIDER")
@@ -180,19 +185,31 @@ func Load() (*Config, error) {
 
 // HasAIKey returns true if at least one AI API key is configured
 func (c *Config) HasAIKey() bool {
-	return c.AnthropicKey != "" || c.OpenAIKey != ""
+	return c.GeminiKey != "" || c.AnthropicKey != "" || c.OpenAIKey != ""
 }
 
 // GetActiveAIKey returns the API key for the configured provider
 func (c *Config) GetActiveAIKey() string {
 	switch c.AIProvider {
+	case "gemini":
+		return c.GeminiKey
 	case "openai":
 		return c.OpenAIKey
+	case "anthropic":
+		return c.AnthropicKey
 	case "ollama":
 		return "" // Ollama doesn't need an API key
 	default:
-		return c.AnthropicKey
+		return c.GeminiKey // Default to Gemini
 	}
+}
+
+// GetGeminiModel returns the Gemini model with default fallback
+func (c *Config) GetGeminiModel() string {
+	if c.GeminiModel == "" {
+		return "gemini-1.5-flash"
+	}
+	return c.GeminiModel
 }
 
 // IsOllamaConfigured returns true if Ollama is properly configured

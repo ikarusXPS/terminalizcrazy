@@ -16,10 +16,24 @@
 # ============================================================================
 
 # Aktiver KI-Anbieter für Befehlsvorschläge und Chat
-# Optionen: "anthropic" (Claude), "openai" (GPT), "ollama" (lokal)
-# Standard: "anthropic"
+# Optionen: "gemini" (Standard), "anthropic" (Claude), "openai" (GPT), "ollama" (lokal)
+# Standard: "gemini"
 # Umgebungsvariable: AI_PROVIDER
-ai_provider = "anthropic"
+ai_provider = "gemini"
+
+# Google Gemini API-Schlüssel
+# Erforderlich wenn ai_provider = "gemini" (Standard)
+# Format: AIzaSyxxxxx
+# Umgebungsvariable: GEMINI_API_KEY
+# WICHTIG: Niemals in Versionskontrolle committen!
+gemini_api_key = ""
+
+# Google Gemini Modell
+# Optionen: "gemini-1.5-flash" (Standard, schnell), "gemini-1.5-pro" (leistungsstark),
+#           "gemini-1.5-flash-8b" (kompakt), "gemini-2.0-flash-exp" (experimentell)
+# Standard: "gemini-1.5-flash"
+# Umgebungsvariable: GEMINI_MODEL
+gemini_model = "gemini-1.5-flash"
 
 # Anthropic (Claude) API-Schlüssel
 # Erforderlich wenn ai_provider = "anthropic"
@@ -260,6 +274,10 @@ log_level = "info"
 # ============================================================================
 # BEISPIELKONFIGURATIONEN
 # ============================================================================
+
+# --- Minimale Konfiguration (Gemini - Standard) ---
+# ai_provider = "gemini"
+# gemini_api_key = "AIzaSyxxxxx"
 
 # --- Minimale Konfiguration (Claude) ---
 # ai_provider = "anthropic"

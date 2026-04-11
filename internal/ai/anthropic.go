@@ -197,3 +197,29 @@ func extractExplanation(content string) string {
 
 	return ""
 }
+
+// CompleteStream sends a streaming request to Anthropic
+// Note: Falls back to non-streaming if stream API is unavailable
+func (c *AnthropicClient) CompleteStream(ctx context.Context, req *Request, handler func(StreamingResponse)) error {
+	// Use the standard Complete method and simulate streaming
+	// This is a fallback approach; real streaming would require library support
+	resp, err := c.Complete(ctx, req)
+	if err != nil {
+		return err
+	}
+
+	// Send the complete response as a single chunk
+	handler(StreamingResponse{
+		Delta:    resp.Content,
+		Done:     false,
+		FullText: resp.Content,
+	})
+
+	handler(StreamingResponse{
+		Done:     true,
+		Command:  resp.Command,
+		FullText: resp.Content,
+	})
+
+	return nil
+}

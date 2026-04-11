@@ -380,13 +380,6 @@ func (c *OllamaClient) PullModel(ctx context.Context, model string) error {
 	return nil
 }
 
-// StreamingResponse represents a streaming response chunk
-type StreamingResponse struct {
-	Content string
-	Done    bool
-	Error   error
-}
-
 // CompleteStream streams the response
 func (c *OllamaClient) CompleteStream(ctx context.Context, req *Request, handler func(StreamingResponse)) error {
 	systemPrompt := c.buildSystemPrompt(req)
@@ -421,6 +414,7 @@ func (c *OllamaClient) CompleteStream(ctx context.Context, req *Request, handler
 		return fmt.Errorf("ollama API error (status %d): %s", resp.StatusCode, string(bodyBytes))
 	}
 
+	var fullText strings.Builder
 	decoder := json.NewDecoder(resp.Body)
 	for {
 		var chunk ollamaResponse
@@ -428,16 +422,22 @@ func (c *OllamaClient) CompleteStream(ctx context.Context, req *Request, handler
 			if err == io.EOF {
 				break
 			}
-			handler(StreamingResponse{Error: err})
 			return err
 		}
 
+		fullText.WriteString(chunk.Response)
 		handler(StreamingResponse{
-			Content: chunk.Response,
-			Done:    chunk.Done,
+			Delta: chunk.Response,
+			Done:  chunk.Done,
 		})
 
 		if chunk.Done {
+			finalText := fullText.String()
+			handler(StreamingResponse{
+				Done:     true,
+				Command:  extractCommand(finalText),
+				FullText: finalText,
+			})
 			break
 		}
 	}

@@ -23,7 +23,7 @@ func TestLoad(t *testing.T) {
 	assert.NotNil(t, cfg)
 
 	// Check defaults
-	assert.Equal(t, "anthropic", cfg.AIProvider)
+	assert.Equal(t, "gemini", cfg.AIProvider)
 	assert.Equal(t, "default", cfg.Theme)
 	assert.True(t, cfg.ShowWelcome)
 	assert.Equal(t, 1000, cfg.HistoryLimit)
@@ -97,30 +97,42 @@ func TestLoadDefaults_Workspace(t *testing.T) {
 func TestConfig_HasAIKey(t *testing.T) {
 	tests := []struct {
 		name         string
+		geminiKey    string
 		anthropicKey string
 		openAIKey    string
 		want         bool
 	}{
 		{
 			name:         "no keys",
+			geminiKey:    "",
 			anthropicKey: "",
 			openAIKey:    "",
 			want:         false,
 		},
 		{
+			name:         "gemini key only",
+			geminiKey:    "AIza123",
+			anthropicKey: "",
+			openAIKey:    "",
+			want:         true,
+		},
+		{
 			name:         "anthropic key only",
+			geminiKey:    "",
 			anthropicKey: "sk-ant-123",
 			openAIKey:    "",
 			want:         true,
 		},
 		{
 			name:         "openai key only",
+			geminiKey:    "",
 			anthropicKey: "",
 			openAIKey:    "sk-123",
 			want:         true,
 		},
 		{
-			name:         "both keys",
+			name:         "all keys",
+			geminiKey:    "AIza123",
 			anthropicKey: "sk-ant-123",
 			openAIKey:    "sk-123",
 			want:         true,
@@ -130,6 +142,7 @@ func TestConfig_HasAIKey(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			cfg := &Config{
+				GeminiKey:    tt.geminiKey,
 				AnthropicKey: tt.anthropicKey,
 				OpenAIKey:    tt.openAIKey,
 			}
@@ -142,13 +155,23 @@ func TestConfig_GetActiveAIKey(t *testing.T) {
 	tests := []struct {
 		name         string
 		provider     string
+		geminiKey    string
 		anthropicKey string
 		openAIKey    string
 		want         string
 	}{
 		{
+			name:         "gemini provider",
+			provider:     "gemini",
+			geminiKey:    "AIza123",
+			anthropicKey: "sk-ant-123",
+			openAIKey:    "sk-456",
+			want:         "AIza123",
+		},
+		{
 			name:         "anthropic provider",
 			provider:     "anthropic",
+			geminiKey:    "AIza123",
 			anthropicKey: "sk-ant-123",
 			openAIKey:    "sk-456",
 			want:         "sk-ant-123",
@@ -156,6 +179,7 @@ func TestConfig_GetActiveAIKey(t *testing.T) {
 		{
 			name:         "openai provider",
 			provider:     "openai",
+			geminiKey:    "AIza123",
 			anthropicKey: "sk-ant-123",
 			openAIKey:    "sk-456",
 			want:         "sk-456",
@@ -163,23 +187,26 @@ func TestConfig_GetActiveAIKey(t *testing.T) {
 		{
 			name:         "ollama provider (no key needed)",
 			provider:     "ollama",
+			geminiKey:    "AIza123",
 			anthropicKey: "sk-ant-123",
 			openAIKey:    "sk-456",
 			want:         "",
 		},
 		{
-			name:         "default provider (anthropic)",
+			name:         "default provider (gemini)",
 			provider:     "",
+			geminiKey:    "AIza123",
 			anthropicKey: "sk-ant-123",
 			openAIKey:    "sk-456",
-			want:         "sk-ant-123",
+			want:         "AIza123",
 		},
 		{
-			name:         "unknown provider defaults to anthropic",
+			name:         "unknown provider defaults to gemini",
 			provider:     "unknown",
+			geminiKey:    "AIza123",
 			anthropicKey: "sk-ant-123",
 			openAIKey:    "sk-456",
-			want:         "sk-ant-123",
+			want:         "AIza123",
 		},
 	}
 
@@ -187,6 +214,7 @@ func TestConfig_GetActiveAIKey(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			cfg := &Config{
 				AIProvider:   tt.provider,
+				GeminiKey:    tt.geminiKey,
 				AnthropicKey: tt.anthropicKey,
 				OpenAIKey:    tt.openAIKey,
 			}

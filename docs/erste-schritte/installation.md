@@ -81,15 +81,24 @@ Voraussetzungen:
 
 TerminalizCrazy benoetigt einen KI-API-Schluessel. Waehlen Sie einen Anbieter:
 
-#### Anthropic (Claude) - empfohlen
+#### Google Gemini - Standard
 
-1. Erstellen Sie einen Account bei console.anthropic.com
+1. Erstellen Sie einen Account bei aistudio.google.com
 2. Generieren Sie einen API-Schluessel
 3. Setzen Sie die Umgebungsvariable:
 
-   export ANTHROPIC_API_KEY="sk-ant-api03-xxxxx"
+   export GEMINI_API_KEY="AIzaSyxxxxx"
 
    Fuer dauerhafte Nutzung zu ~/.bashrc oder ~/.zshrc hinzufuegen.
+
+#### Anthropic (Claude)
+
+1. Erstellen Sie einen Account bei console.anthropic.com
+2. Generieren Sie einen API-Schluessel
+3. Setzen Sie die Umgebungsvariablen:
+
+   export ANTHROPIC_API_KEY="sk-ant-api03-xxxxx"
+   export AI_PROVIDER="anthropic"
 
 #### OpenAI
 
@@ -147,7 +156,7 @@ Siehe [Einstellungen](../referenz/einstellungen.md) fuer alle Optionen.
 
 ### KI nicht verbunden
 
-- Pruefen Sie, ob ANTHROPIC_API_KEY oder OPENAI_API_KEY gesetzt ist
+- Pruefen Sie, ob GEMINI_API_KEY, ANTHROPIC_API_KEY oder OPENAI_API_KEY gesetzt ist
 - Pruefen Sie die Netzwerkverbindung
 - Bei Ollama: Stellen Sie sicher, dass ollama serve laeuft
 

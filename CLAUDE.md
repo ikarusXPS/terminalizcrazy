@@ -31,13 +31,18 @@ make lint                                  # Requires golangci-lint
 ## Environment Setup
 
 Requires one of:
+- `GEMINI_API_KEY` - For Google Gemini (default provider)
 - `ANTHROPIC_API_KEY` - For Claude AI
 - `OPENAI_API_KEY` - For OpenAI
 - `OLLAMA_ENABLED=true` + `OLLAMA_MODEL=codellama` - For local Ollama
 
 Config file: `~/.terminalizcrazy/config.toml`
 
-Agent mode (`agent_mode`): `off` | `suggest` (recommended) | `auto`
+```toml
+ai_provider = "gemini"           # gemini (default), anthropic, openai, ollama
+gemini_model = "gemini-1.5-flash" # or gemini-1.5-pro, gemini-2.0-flash-exp
+agent_mode = "suggest"           # off, suggest (recommended), auto
+```
 
 ## Architecture Overview
 
@@ -60,7 +65,7 @@ main.go → config.Load() → tui.Run()
 
 | Package | Purpose |
 |---------|---------|
-| `internal/ai/` | AI clients (Anthropic, OpenAI, Ollama) + Agent mode + Planner |
+| `internal/ai/` | AI clients (Gemini, Anthropic, OpenAI, Ollama) + Agent mode + Planner |
 | `internal/tui/` | Bubble Tea TUI with pane/tab system |
 | `internal/executor/` | Command execution with risk assessment |
 | `internal/storage/` | SQLite for sessions, messages, history, plans, workspaces |
@@ -74,26 +79,23 @@ main.go → config.Load() → tui.Run()
 
 ### AI Integration Pattern
 
-All AI providers implement `ai.Client` interface in `internal/ai/ai.go`:
+All AI providers implement `ai.Client` interface:
 ```go
 type Client interface {
     Complete(ctx context.Context, req *Request) (*Response, error)
     Provider() Provider
 }
 
-// RequestType: "command" | "explain" | "chat"
-// Provider: "anthropic" | "openai" | "ollama"
+// Optional streaming support
+type StreamingClient interface {
+    Client
+    CompleteStream(ctx context.Context, req *Request, handler func(StreamingResponse)) error
+}
 ```
 
+Providers: `gemini.go` (default), `anthropic.go`, `openai.go`, `ollama.go`
+
 Agent mode (`ai.Agent`) uses `ai.Planner` to create multi-step task plans that can be approved and executed. Plans contain Tasks with verification (exit_code, output_contains, run_command).
-
-### Risk Assessment
-
-Command execution uses 4 risk levels in `internal/executor/executor.go`:
-- `RiskLow` - Safe (ls, cat, echo)
-- `RiskMedium` - Modifying (mv, cp, git push)
-- `RiskHigh` - Destructive (rm, delete, drop)
-- `RiskCritical` - System-altering (sudo, chmod 777)
 
 ### TUI Architecture
 
@@ -125,13 +127,13 @@ Hook-based with priority ordering. Built-in plugins:
 |-----|--------|
 | `Ctrl+E` | Execute last suggested command |
 | `Ctrl+Y` | Copy command to clipboard |
-| `Ctrl+L` | Clear chat |
 | `Ctrl+T` | New tab |
 | `Ctrl+W` | Close pane |
 | `Ctrl+\` | Vertical split |
 | `Ctrl+-` | Horizontal split |
 | `Ctrl+Z` | Toggle pane zoom |
 | `Alt+Arrow` | Navigate panes |
+| `Ctrl+A` | Toggle agent mode (off → suggest → auto) |
+| `Ctrl+M` | Model selector (switch AI models) |
 | `Ctrl+S` | Share session (collaboration) |
 | `Ctrl+J` | Join session |
-| `Ctrl+D` | Disconnect from session |

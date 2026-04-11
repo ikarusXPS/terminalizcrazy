@@ -11,7 +11,7 @@ TerminalizCrazy is a modern, feature-complete AI terminal built with Go and the 
 ## Features
 
 ### AI Integration
-- **Multi-Provider Support** - Claude (Anthropic), GPT (OpenAI), and Ollama (local)
+- **Multi-Provider Support** - Gemini (default), Claude (Anthropic), GPT (OpenAI), and Ollama (local)
 - **Natural Language Commands** - Describe what you want, get the right command
 - **Error Explanation** - AI explains errors and suggests fixes
 - **Project-Aware Context** - Recognizes 11 project types with framework detection
@@ -104,15 +104,21 @@ go install github.com/ikarusXPS/terminalizcrazy/cmd/terminalizcrazy@latest
 ### 1. Set API Key
 
 ```bash
-# Anthropic (Claude)
+# Google Gemini (default)
+export GEMINI_API_KEY="AIzaSy..."
+
+# OR Anthropic (Claude)
 export ANTHROPIC_API_KEY="sk-ant-api03-..."
+export AI_PROVIDER="anthropic"
 
 # OR OpenAI
 export OPENAI_API_KEY="sk-..."
+export AI_PROVIDER="openai"
 
 # OR Ollama (local, no key needed)
 export OLLAMA_ENABLED=true
 export OLLAMA_MODEL=codellama
+export AI_PROVIDER="ollama"
 ```
 
 ### 2. Run
@@ -174,7 +180,8 @@ Config file: `~/.terminalizcrazy/config.toml`
 
 ```toml
 # AI Provider
-ai_provider = "anthropic"  # anthropic, openai, ollama
+ai_provider = "gemini"     # gemini (default), anthropic, openai, ollama
+gemini_model = "gemini-1.5-flash"  # gemini-1.5-flash, gemini-1.5-pro, gemini-2.0-flash-exp
 
 # Agent Mode
 agent_mode = "suggest"     # off, suggest, auto

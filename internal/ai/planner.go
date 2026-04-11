@@ -487,7 +487,7 @@ func NewCommandExtractor() *CommandExtractor {
 	patterns := []*regexp.Regexp{
 		regexp.MustCompile("```(?:bash|sh|shell)?\n([^`]+)```"),
 		regexp.MustCompile("`([^`]+)`"),
-		regexp.MustCompile("\\$\\s+(.+)"),
+		regexp.MustCompile(`\$\s+(.+)`),
 	}
 
 	return &CommandExtractor{patterns: patterns}

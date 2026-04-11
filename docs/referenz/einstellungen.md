@@ -17,11 +17,34 @@ TerminalizCrazy wird ueber ~/.terminalizcrazy/config.toml konfiguriert. Alle Ein
 | Eigenschaft | Wert |
 |-------------|------|
 | Typ | string |
-| Standard | anthropic |
-| Optionen | anthropic, openai, ollama |
+| Standard | gemini |
+| Optionen | gemini, anthropic, openai, ollama |
 | Umgebungsvariable | AI_PROVIDER |
 
 Waehlt den KI-Anbieter fuer Befehlsvorschlaege und Chat.
+
+### gemini_api_key
+
+| Eigenschaft | Wert |
+|-------------|------|
+| Typ | string |
+| Standard | (leer) |
+| Umgebungsvariable | GEMINI_API_KEY |
+
+API-Schluessel fuer Google Gemini. Erforderlich wenn ai_provider = gemini (Standard).
+
+Format: AIzaSyxxxxx
+
+### gemini_model
+
+| Eigenschaft | Wert |
+|-------------|------|
+| Typ | string |
+| Standard | gemini-1.5-flash |
+| Optionen | gemini-1.5-flash, gemini-1.5-flash-8b, gemini-1.5-pro, gemini-2.0-flash-exp |
+| Umgebungsvariable | GEMINI_MODEL |
+
+Zu verwendendes Gemini-Modell.
 
 ### anthropic_api_key
 
@@ -293,6 +316,8 @@ Siehe [Secret Guard](../konzepte/secret-guard.md).
 
 | Variable | Einstellung |
 |----------|-------------|
+| GEMINI_API_KEY | gemini_api_key |
+| GEMINI_MODEL | gemini_model |
 | ANTHROPIC_API_KEY | anthropic_api_key |
 | OPENAI_API_KEY | openai_api_key |
 | AI_PROVIDER | ai_provider |
