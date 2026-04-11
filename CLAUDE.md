@@ -17,8 +17,11 @@ make run
 go test ./...                              # All tests
 go test -v ./internal/ai/...               # Single package with verbose
 go test -v -run TestAgentMode ./internal/ai/  # Single test by name
+go test -race ./...                        # With race detection
 go test -cover ./...                       # With coverage summary
 make test-coverage                         # HTML coverage report
+
+# CI Notes: Windows workspace tests are flaky and allowed to fail
 
 # Lint & Format
 go fmt ./...
@@ -31,6 +34,10 @@ Requires one of:
 - `ANTHROPIC_API_KEY` - For Claude AI
 - `OPENAI_API_KEY` - For OpenAI
 - `OLLAMA_ENABLED=true` + `OLLAMA_MODEL=codellama` - For local Ollama
+
+Config file: `~/.terminalizcrazy/config.toml`
+
+Agent mode (`agent_mode`): `off` | `suggest` (recommended) | `auto`
 
 ## Architecture Overview
 
@@ -67,15 +74,26 @@ main.go → config.Load() → tui.Run()
 
 ### AI Integration Pattern
 
-All AI providers implement `ai.Client` interface:
+All AI providers implement `ai.Client` interface in `internal/ai/ai.go`:
 ```go
 type Client interface {
     Complete(ctx context.Context, req *Request) (*Response, error)
     Provider() Provider
 }
+
+// RequestType: "command" | "explain" | "chat"
+// Provider: "anthropic" | "openai" | "ollama"
 ```
 
 Agent mode (`ai.Agent`) uses `ai.Planner` to create multi-step task plans that can be approved and executed. Plans contain Tasks with verification (exit_code, output_contains, run_command).
+
+### Risk Assessment
+
+Command execution uses 4 risk levels in `internal/executor/executor.go`:
+- `RiskLow` - Safe (ls, cat, echo)
+- `RiskMedium` - Modifying (mv, cp, git push)
+- `RiskHigh` - Destructive (rm, delete, drop)
+- `RiskCritical` - System-altering (sudo, chmod 777)
 
 ### TUI Architecture
 
@@ -107,6 +125,7 @@ Hook-based with priority ordering. Built-in plugins:
 |-----|--------|
 | `Ctrl+E` | Execute last suggested command |
 | `Ctrl+Y` | Copy command to clipboard |
+| `Ctrl+L` | Clear chat |
 | `Ctrl+T` | New tab |
 | `Ctrl+W` | Close pane |
 | `Ctrl+\` | Vertical split |
@@ -115,3 +134,4 @@ Hook-based with priority ordering. Built-in plugins:
 | `Alt+Arrow` | Navigate panes |
 | `Ctrl+S` | Share session (collaboration) |
 | `Ctrl+J` | Join session |
+| `Ctrl+D` | Disconnect from session |
