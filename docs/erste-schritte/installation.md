@@ -77,21 +77,33 @@ Voraussetzungen:
 
 ## Konfiguration
 
-### API-Schluessel einrichten
+### KI-Provider einrichten
 
-TerminalizCrazy benoetigt einen KI-API-Schluessel. Waehlen Sie einen Anbieter:
+TerminalizCrazy verwendet standardmaessig Ollama mit Gemma4 (lokal, kostenlos).
 
-#### Google Gemini - Standard
+#### Ollama mit Gemma4 - Standard
+
+1. Installieren Sie Ollama von ollama.ai
+2. Laden Sie Gemma4 herunter:
+
+   ollama pull gemma4
+
+3. Starten Sie Ollama:
+
+   ollama serve
+
+   Keine weiteren Einstellungen erforderlich - Ollama ist der Standard-Provider.
+
+#### Google Gemini (Cloud-Alternative)
 
 1. Erstellen Sie einen Account bei aistudio.google.com
 2. Generieren Sie einen API-Schluessel
-3. Setzen Sie die Umgebungsvariable:
+3. Setzen Sie die Umgebungsvariablen:
 
    export GEMINI_API_KEY="AIzaSyxxxxx"
+   export AI_PROVIDER="gemini"
 
-   Fuer dauerhafte Nutzung zu ~/.bashrc oder ~/.zshrc hinzufuegen.
-
-#### Anthropic (Claude)
+#### Anthropic Claude (Cloud-Alternative)
 
 1. Erstellen Sie einen Account bei console.anthropic.com
 2. Generieren Sie einen API-Schluessel
@@ -100,7 +112,7 @@ TerminalizCrazy benoetigt einen KI-API-Schluessel. Waehlen Sie einen Anbieter:
    export ANTHROPIC_API_KEY="sk-ant-api03-xxxxx"
    export AI_PROVIDER="anthropic"
 
-#### OpenAI
+#### OpenAI (Cloud-Alternative)
 
 1. Erstellen Sie einen Account bei platform.openai.com
 2. Generieren Sie einen API-Schluessel
@@ -108,18 +120,6 @@ TerminalizCrazy benoetigt einen KI-API-Schluessel. Waehlen Sie einen Anbieter:
 
    export OPENAI_API_KEY="sk-xxxxx"
    export AI_PROVIDER="openai"
-
-#### Ollama (lokal, kostenlos)
-
-1. Installieren Sie Ollama von ollama.ai
-2. Laden Sie ein Modell herunter:
-
-   ollama pull codellama
-
-3. Setzen Sie die Umgebungsvariable:
-
-   export OLLAMA_ENABLED="true"
-   export AI_PROVIDER="ollama"
 
 ---
 

@@ -30,17 +30,18 @@ make lint                                  # Requires golangci-lint
 
 ## Environment Setup
 
-Requires one of:
-- `GEMINI_API_KEY` - For Google Gemini (default provider)
+Default: Ollama with Gemma4 (local, no API key required)
+
+Optional cloud providers:
+- `GEMINI_API_KEY` - For Google Gemini
 - `ANTHROPIC_API_KEY` - For Claude AI
 - `OPENAI_API_KEY` - For OpenAI
-- `OLLAMA_ENABLED=true` + `OLLAMA_MODEL=codellama` - For local Ollama
 
 Config file: `~/.terminalizcrazy/config.toml`
 
 ```toml
-ai_provider = "gemini"           # gemini (default), anthropic, openai, ollama
-gemini_model = "gemini-1.5-flash" # or gemini-1.5-pro, gemini-2.0-flash-exp
+ai_provider = "ollama"           # ollama (default), gemini, anthropic, openai
+ollama_model = "gemma4"          # or gemma4:e4b, codellama, llama3
 agent_mode = "suggest"           # off, suggest (recommended), auto
 ```
 

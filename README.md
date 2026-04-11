@@ -11,7 +11,7 @@
 
 ```
 +-------------------------------------------------------------+
-|  TerminalizCrazy v0.1.0   gemini   [abc123]                 |
+|  TerminalizCrazy v0.1.0   ollama/gemma4   [abc123]          |
 +-------------------------------------------------------------+
 |                                                             |
 |  You: how to find large files?                              |
@@ -36,7 +36,7 @@ TerminalizCrazy is a modern, feature-complete AI terminal built with Go and the 
 ## Features
 
 ### AI Integration
-- **Multi-Provider Support** - Gemini (default), Claude (Anthropic), GPT (OpenAI), and Ollama (local)
+- **Multi-Provider Support** - Ollama/Gemma4 (default, local), Gemini, Claude (Anthropic), GPT (OpenAI)
 - **Natural Language Commands** - Describe what you want, get the right command
 - **Error Explanation** - AI explains errors and suggests fixes
 - **Project-Aware Context** - Recognizes 11 project types with framework detection
@@ -140,24 +140,25 @@ go install github.com/ikarusXPS/terminalizcrazy/cmd/terminalizcrazy@latest
 
 ## Quick Start
 
-### 1. Set API Key
+### 1. Setup AI Provider
 
 ```bash
-# Google Gemini (default)
-export GEMINI_API_KEY="AIzaSy..."
+# Ollama with Gemma4 (default, local, no API key needed)
+# Just make sure Ollama is running with gemma4:
+ollama pull gemma4
+ollama serve
 
-# OR Anthropic (Claude)
+# OR Google Gemini (cloud)
+export GEMINI_API_KEY="AIzaSy..."
+export AI_PROVIDER="gemini"
+
+# OR Anthropic Claude (cloud)
 export ANTHROPIC_API_KEY="sk-ant-api03-..."
 export AI_PROVIDER="anthropic"
 
-# OR OpenAI
+# OR OpenAI (cloud)
 export OPENAI_API_KEY="sk-..."
 export AI_PROVIDER="openai"
-
-# OR Ollama (local, no key needed)
-export OLLAMA_ENABLED=true
-export OLLAMA_MODEL=codellama
-export AI_PROVIDER="ollama"
 ```
 
 ### 2. Run
@@ -219,17 +220,19 @@ Config file: `~/.terminalizcrazy/config.toml`
 
 ```toml
 # AI Provider
-ai_provider = "gemini"     # gemini (default), anthropic, openai, ollama
-gemini_model = "gemini-1.5-flash"  # gemini-1.5-flash, gemini-1.5-pro, gemini-2.0-flash-exp
+ai_provider = "ollama"     # ollama (default), gemini, anthropic, openai
+
+# Ollama (Local AI - Default)
+ollama_enabled = true
+ollama_url = "http://localhost:11434"
+ollama_model = "gemma4"    # gemma4, gemma4:e4b, codellama, llama3
 
 # Agent Mode
 agent_mode = "suggest"     # off, suggest, auto
 agent_max_tasks = 10
 
-# Ollama (Local AI)
-ollama_enabled = false
-ollama_url = "http://localhost:11434"
-ollama_model = "codellama"
+# Cloud Providers (optional)
+# gemini_model = "gemini-1.5-flash"
 
 # Appearance
 theme = "default"          # default, dracula, monokai, nord, solarized

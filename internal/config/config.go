@@ -100,8 +100,8 @@ type WorkspaceConfig struct {
 // Load reads configuration from file and environment
 func Load() (*Config, error) {
 	// Set defaults
-	viper.SetDefault("ai_provider", "gemini") // Default to Gemini
-	viper.SetDefault("gemini_model", "gemini-1.5-flash") // Default Gemini model
+	viper.SetDefault("ai_provider", "ollama") // Default to Ollama (local)
+	viper.SetDefault("gemini_model", "gemini-1.5-flash") // Gemini model if used
 	viper.SetDefault("theme", "default")
 	viper.SetDefault("show_welcome", true)
 	viper.SetDefault("history_limit", 1000)
@@ -109,10 +109,10 @@ func Load() (*Config, error) {
 	viper.SetDefault("debug", false)
 	viper.SetDefault("log_level", "info")
 
-	// Ollama defaults
+	// Ollama defaults (now the primary provider)
 	viper.SetDefault("ollama_url", "http://localhost:11434")
-	viper.SetDefault("ollama_model", "codellama")
-	viper.SetDefault("ollama_enabled", false)
+	viper.SetDefault("ollama_model", "gemma4")
+	viper.SetDefault("ollama_enabled", true)
 
 	// Agent defaults
 	viper.SetDefault("agent_mode", "suggest")

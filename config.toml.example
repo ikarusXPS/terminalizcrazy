@@ -16,10 +16,10 @@
 # ============================================================================
 
 # Aktiver KI-Anbieter für Befehlsvorschläge und Chat
-# Optionen: "gemini" (Standard), "anthropic" (Claude), "openai" (GPT), "ollama" (lokal)
-# Standard: "gemini"
+# Optionen: "ollama" (Standard, lokal), "gemini", "anthropic" (Claude), "openai" (GPT)
+# Standard: "ollama"
 # Umgebungsvariable: AI_PROVIDER
-ai_provider = "gemini"
+ai_provider = "ollama"
 
 # Google Gemini API-Schlüssel
 # Erforderlich wenn ai_provider = "gemini" (Standard)
@@ -57,9 +57,9 @@ openai_api_key = ""
 
 # Ollama aktivieren
 # Wenn true, wird Ollama anstelle von Cloud-APIs verwendet
-# Standard: false
+# Standard: true
 # Umgebungsvariable: OLLAMA_ENABLED
-ollama_enabled = false
+ollama_enabled = true
 
 # Ollama Server-URL
 # Standard: "http://localhost:11434"
@@ -67,12 +67,12 @@ ollama_enabled = false
 ollama_url = "http://localhost:11434"
 
 # Ollama Modell
-# Empfohlen für Code: codellama, deepseek-coder
-# Allgemein: llama2, llama3, mistral, mixtral
+# Empfohlen: gemma4, gemma4:e4b, codellama, deepseek-coder
+# Allgemein: llama3, mistral, mixtral
 # Modell muss zuerst mit 'ollama pull <modell>' heruntergeladen werden
-# Standard: "codellama"
+# Standard: "gemma4"
 # Umgebungsvariable: OLLAMA_MODEL
-ollama_model = "codellama"
+ollama_model = "gemma4"
 
 # ============================================================================
 # AGENT-MODUS
@@ -301,18 +301,18 @@ log_level = "info"
 # BEISPIELKONFIGURATIONEN
 # ============================================================================
 
-# --- Minimale Konfiguration (Gemini - Standard) ---
+# --- Minimale Konfiguration (Ollama - Standard) ---
+# ai_provider = "ollama"
+# ollama_enabled = true
+# ollama_model = "gemma4"
+
+# --- Cloud-Alternative: Gemini ---
 # ai_provider = "gemini"
 # gemini_api_key = "AIzaSyxxxxx"
 
-# --- Minimale Konfiguration (Claude) ---
+# --- Cloud-Alternative: Claude ---
 # ai_provider = "anthropic"
 # anthropic_api_key = "sk-ant-api03-xxx"
-
-# --- Lokale KI mit Ollama ---
-# ai_provider = "ollama"
-# ollama_enabled = true
-# ollama_model = "codellama"
 
 # --- Sicherheitsbewusste Konfiguration ---
 # agent_mode = "off"

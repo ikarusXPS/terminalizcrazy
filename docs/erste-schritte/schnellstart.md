@@ -4,7 +4,7 @@
 
 ```
 +-------------------------------------------------------------+
-|  TerminalizCrazy v0.1.0   gemini   [session-id]             |
+|  TerminalizCrazy v0.1.0   ollama/gemma4   [session-id]      |
 +-------------------------------------------------------------+
 |                                                             |
 |  Willkommen! Stellen Sie Ihre erste Frage...                |
@@ -19,7 +19,7 @@
 ## Voraussetzungen
 
 - TerminalizCrazy installiert (siehe [Installation](installation.md))
-- API-Schluessel konfiguriert (GEMINI_API_KEY, ANTHROPIC_API_KEY, OPENAI_API_KEY, oder Ollama)
+- Ollama mit Gemma4 (Standard) oder Cloud-Provider konfiguriert
 
 ---
 

@@ -4,7 +4,7 @@
 
 ```
 +-------------------------------------------------------------+
-|  TerminalizCrazy v0.1.0   gemini   [session]                |
+|  TerminalizCrazy v0.1.0   ollama/gemma4   [session]         |
 +-------------------------------------------------------------+
 |  KI-native Terminal mit Agent Mode, Collaboration,          |
 |  SecretGuard und Multi-Provider Support                     |
@@ -56,7 +56,7 @@ TerminalizCrazy ist ein **KI-natives Terminal**, das natürliche Sprache in Term
 
 ### Hauptfunktionen
 
-- **Multi-Provider Support** - Gemini (Standard), Claude, GPT, Ollama
+- **Multi-Provider Support** - Ollama/Gemma4 (Standard), Gemini, Claude, GPT
 - **Agent-Modus** - Automatische Planung und Ausführung komplexer Aufgaben (Ctrl+A)
 - **Live Model-Wechsel** - KI-Modell ohne Neustart wechseln (Ctrl+M)
 - **Risikobewertung** - Warnung vor gefährlichen Befehlen (4 Stufen)
@@ -82,12 +82,12 @@ TerminalizCrazy: Hier ist der Befehl:
 ## Schnellstart
 
 ```bash
-# 1. API-Key setzen (Gemini ist Standard)
-export GEMINI_API_KEY="AIzaSy..."
+# 1. Ollama mit Gemma4 starten (Standard, lokal)
+ollama pull gemma4
+ollama serve
 
-# Oder alternativ:
-# export ANTHROPIC_API_KEY="sk-ant-api03-xxx"
-# export OPENAI_API_KEY="sk-..."
+# Oder Cloud-Provider:
+# export GEMINI_API_KEY="AIzaSy..." && export AI_PROVIDER="gemini"
 
 # 2. Starten
 terminalizcrazy

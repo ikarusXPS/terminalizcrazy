@@ -32,19 +32,20 @@ Nach diesem Tutorial werden Sie:
 Pruefen Sie, ob TerminalizCrazy korrekt installiert ist:
 
 ```bash
-# API-Key pruefen (Gemini ist Standard)
-echo $GEMINI_API_KEY
+# Ollama pruefen (Standard-Provider)
+ollama list
 
-# Oder einen der anderen Provider
-echo $ANTHROPIC_API_KEY
-echo $OPENAI_API_KEY
+# Gemma4 sollte angezeigt werden
+# Falls nicht:
+ollama pull gemma4
+ollama serve
 ```
 
-Falls noch kein API-Key gesetzt ist:
+Fuer Cloud-Provider (optional):
 
 ```bash
-# Gemini (kostenlos, empfohlen fuer den Start)
-export GEMINI_API_KEY="AIzaSy..."
+# Gemini
+export GEMINI_API_KEY="AIzaSy..." && export AI_PROVIDER="gemini"
 ```
 
 ---
@@ -59,7 +60,7 @@ terminalizcrazy
 
 ```
 +-------------------------------------------------------------+
-|  TerminalizCrazy v0.1.0   gemini   [abc123]                 |
+|  TerminalizCrazy v0.1.0   ollama/gemma4   [abc123]          |
 +-------------------------------------------------------------+
 |                                                             |
 |  Willkommen bei TerminalizCrazy!                            |
@@ -74,7 +75,7 @@ terminalizcrazy
 
 Sie sehen:
 - Den Header mit Projektname und Version
-- KI-Provider und Status (gemini = verbunden)
+- KI-Provider und Status (ollama/gemma4 = verbunden)
 - Session-ID in eckigen Klammern
 - Eingabefeld am unteren Rand
 
@@ -324,10 +325,11 @@ Die KI erklaert jeden Teil des Befehls.
 ### Model wechseln
 
 Druecken Sie **Ctrl+M** um zwischen KI-Modellen zu wechseln:
-- Gemini Flash (schnell, kosteneffizient)
-- Gemini Pro (leistungsfaehiger)
-- Claude (Anthropic)
-- GPT-4 (OpenAI)
+- Gemma4 (Standard, lokal via Ollama)
+- Gemma4:e4b (kompaktere Variante)
+- Gemini Flash/Pro (Cloud)
+- Claude (Anthropic, Cloud)
+- GPT-4 (OpenAI, Cloud)
 
 ---
 
