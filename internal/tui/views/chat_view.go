@@ -7,6 +7,7 @@ import (
 
 	"github.com/charmbracelet/bubbles/viewport"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/muesli/reflow/wordwrap"
 )
 
 // ChatMessage represents a chat message
@@ -45,6 +46,8 @@ type ChatView struct {
 func NewChatView(width, height int, styles ChatViewStyles) *ChatView {
 	vp := viewport.New(width, height)
 	vp.HighPerformanceRendering = false
+	vp.MouseWheelEnabled = true
+	vp.MouseWheelDelta = 3
 
 	return &ChatView{
 		viewport: vp,
@@ -137,6 +140,11 @@ func (c *ChatView) updateContent() {
 	}
 
 	var content strings.Builder
+	// Use width - 2 for padding
+	wrapWidth := c.width - 2
+	if wrapWidth < 20 {
+		wrapWidth = 20
+	}
 
 	for _, msg := range c.messages {
 		timestamp := msg.Timestamp.Format("15:04")
@@ -147,7 +155,7 @@ func (c *ChatView) updateContent() {
 				c.styles.UserMsg.Render("You:"),
 				c.styles.Timestamp.Render(timestamp),
 			))
-			content.WriteString(msg.Content + "\n\n")
+			content.WriteString(wordwrap.String(msg.Content, wrapWidth) + "\n\n")
 
 		case "ai":
 			content.WriteString(fmt.Sprintf("%s %s\n",
@@ -161,10 +169,10 @@ func (c *ChatView) updateContent() {
 
 				explanation := extractExplanation(msg.Content)
 				if explanation != "" {
-					content.WriteString(explanation + "\n")
+					content.WriteString(wordwrap.String(explanation, wrapWidth) + "\n")
 				}
 			} else {
-				content.WriteString(msg.Content + "\n")
+				content.WriteString(wordwrap.String(msg.Content, wrapWidth) + "\n")
 			}
 			content.WriteString("\n")
 
@@ -173,7 +181,7 @@ func (c *ChatView) updateContent() {
 				c.styles.SystemMsg.Render("System:"),
 				c.styles.Timestamp.Render(timestamp),
 			))
-			content.WriteString(c.styles.SystemMsg.Render(msg.Content) + "\n\n")
+			content.WriteString(c.styles.SystemMsg.Render(wordwrap.String(msg.Content, wrapWidth)) + "\n\n")
 
 		case "output":
 			if msg.Success {
@@ -181,14 +189,14 @@ func (c *ChatView) updateContent() {
 			} else {
 				content.WriteString(c.styles.Error.Render("✗ Command failed") + " " + c.styles.Timestamp.Render(timestamp) + "\n")
 			}
-			content.WriteString(c.styles.Output.Render(msg.Content) + "\n\n")
+			content.WriteString(c.styles.Output.Render(wordwrap.String(msg.Content, wrapWidth)) + "\n\n")
 
 		case "collab":
 			content.WriteString(fmt.Sprintf("%s %s\n",
 				c.styles.AIMsg.Render("Collaborator:"),
 				c.styles.Timestamp.Render(timestamp),
 			))
-			content.WriteString(msg.Content + "\n\n")
+			content.WriteString(wordwrap.String(msg.Content, wrapWidth) + "\n\n")
 		}
 	}
 

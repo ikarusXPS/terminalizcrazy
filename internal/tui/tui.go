@@ -1384,7 +1384,7 @@ func (m *Model) executeCommand(command string) tea.Cmd {
 // sendAIRequest creates a command that sends a request to the AI service
 func (m *Model) sendAIRequest(input string) tea.Cmd {
 	return func() tea.Msg {
-		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+		ctx, cancel := context.WithTimeout(context.Background(), 120*time.Second)
 		defer cancel()
 
 		// Build project context
