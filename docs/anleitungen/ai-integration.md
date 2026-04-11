@@ -13,7 +13,7 @@ TerminalizCrazy integriert verschiedene KI-Anbieter fuer intelligente Befehlsvor
 ### Google Gemini - Standard
 
 | Eigenschaft | Wert |
-|-------------|------|
+| ------------- | ------ |
 | Modell | Gemini 1.5 Flash (Standard), Gemini 1.5 Pro |
 | Staerken | Schnell, kosteneffizient, gutes Code-Verstaendnis |
 | Setup | GEMINI_API_KEY |
@@ -21,7 +21,7 @@ TerminalizCrazy integriert verschiedene KI-Anbieter fuer intelligente Befehlsvor
 ### Anthropic (Claude)
 
 | Eigenschaft | Wert |
-|-------------|------|
+| ------------- | ------ |
 | Modell | Claude 3.5 Sonnet |
 | Staerken | Code-Verstaendnis, Praezision |
 | Setup | ANTHROPIC_API_KEY |
@@ -29,7 +29,7 @@ TerminalizCrazy integriert verschiedene KI-Anbieter fuer intelligente Befehlsvor
 ### OpenAI
 
 | Eigenschaft | Wert |
-|-------------|------|
+| ------------- | ------ |
 | Modell | GPT-4 |
 | Staerken | Breites Wissen |
 | Setup | OPENAI_API_KEY |
@@ -37,7 +37,7 @@ TerminalizCrazy integriert verschiedene KI-Anbieter fuer intelligente Befehlsvor
 ### Ollama (lokal)
 
 | Eigenschaft | Wert |
-|-------------|------|
+| ------------- | ------ |
 | Modell | CodeLlama, Llama3, etc. |
 | Staerken | Privat, kostenlos |
 | Setup | ollama_enabled = true |
@@ -123,7 +123,7 @@ Die KI beruecksichtigt diesen Kontext automatisch.
 Die KI erkennt Ihren Projekttyp und passt Vorschlaege an:
 
 | Projekttyp | Erkannte Dateien | Angepasste Vorschlaege |
-|------------|------------------|------------------------|
+| ------------ | ------------------ | ------------------------ |
 | Go | go.mod | go build, go test |
 | Node.js | package.json | npm, yarn |
 | Python | requirements.txt | pip, python |
@@ -173,7 +173,7 @@ Die KI analysiert:
 ### API-Limits
 
 | Anbieter | Rate Limit | Token Limit |
-|----------|-----------|-------------|
+| ---------- | ----------- | ------------- |
 | Anthropic | 50 req/min | 100k tokens |
 | OpenAI | 60 req/min | 8k tokens |
 | Ollama | Unbegrenzt | Modellabhaengig |
