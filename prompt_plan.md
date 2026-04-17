@@ -1,14 +1,19 @@
 # TerminalizCrazy - Implementation Plan
 
-> Roadmap for future development phases.
+> Roadmap for future development phases with prioritized tasks.
+
+---
 
 ## Current Status
 
-**Version:** Development
-**Core Features:** Complete
-**Test Coverage:** ~70%
+| Metric | Value |
+|--------|-------|
+| Version | Development (pre-1.0) |
+| Core Features | Complete |
+| Test Coverage | ~70% |
+| Open Issues | See GitHub Issues |
 
-### Implemented
+### Implemented Features
 - [x] Multi-provider AI (Ollama, Gemini, Anthropic, OpenAI)
 - [x] Agent mode with task planning
 - [x] Real-time collaboration with E2E encryption
@@ -22,112 +27,254 @@
 
 ---
 
-## Phase 1: Testing & Stability
+## Priority Legend
 
-Priority: HIGH | Status: In Progress
+| Priority | Meaning | Timeline |
+|----------|---------|----------|
+| P0 | Critical / Blocker | This sprint |
+| P1 | High / Important | Next sprint |
+| P2 | Medium / Nice-to-have | Future |
+| P3 | Low / Backlog | When time permits |
 
-- [ ] Increase test coverage to 80%+
-- [ ] Fix flaky Windows workspace tests
-- [ ] Add integration tests for AI providers
-- [ ] Add E2E tests for collaboration flow
-- [ ] Performance profiling and optimization
+| Effort | Meaning |
+|--------|---------|
+| XS | < 1 hour |
+| S | 1-4 hours |
+| M | 1-2 days |
+| L | 3-5 days |
+| XL | 1+ week |
 
-### Dependencies
-- None (independent phase)
+---
+
+## Phase 1: Testing & Stability (Current)
+
+> **Goal:** Reach 80% test coverage, fix flaky tests, ensure CI green
+
+| Priority | Task | Effort | Owner | Status |
+|----------|------|--------|-------|--------|
+| P0 | Fix flaky Windows workspace tests | M | - | 🔴 Blocked |
+| P0 | Add race detection to CI | S | - | ✅ Done |
+| P1 | Unit tests for `internal/ai/` (target: 85%) | L | - | 🟡 In Progress |
+| P1 | Unit tests for `internal/tui/` (target: 80%) | L | - | 🟡 In Progress |
+| P1 | Unit tests for `internal/collab/` (target: 80%) | M | - | ⚪ Pending |
+| P1 | Integration test: Ollama provider | M | - | ⚪ Pending |
+| P2 | Integration test: collaboration 2-user | L | - | ⚪ Pending |
+| P2 | Performance profiling (startup < 500ms) | M | - | ⚪ Pending |
+| P2 | Memory profiling (< 100MB steady state) | S | - | ⚪ Pending |
+
+### Success Criteria
+- [ ] `go test -race ./...` passes
+- [ ] `go test -cover ./...` shows 80%+
+- [ ] CI pipeline green on all platforms
+- [ ] No flaky tests in last 10 runs
+
+### Risks
+| Risk | Mitigation |
+|------|------------|
+| Windows tests require specific env | Add Windows CI runner with fixtures |
+| Ollama not available in CI | Use mock client for unit tests |
 
 ---
 
 ## Phase 2: AI Enhancements
 
-Priority: MEDIUM | Status: Planned
+> **Goal:** Full streaming support, better context management
 
-- [ ] Add streaming support to Anthropic client
-- [ ] Add streaming support to OpenAI client
-- [ ] Implement context window management
-- [ ] Add conversation summarization
-- [ ] Support for custom system prompts
-- [ ] Model-specific prompt optimization
+| Priority | Task | Effort | Depends On | Status |
+|----------|------|--------|------------|--------|
+| P1 | Add streaming to Anthropic client | M | Phase 1 | ⚪ Pending |
+| P1 | Add streaming to OpenAI client | M | Phase 1 | ⚪ Pending |
+| P1 | Context window tracking (show tokens used) | S | - | ⚪ Pending |
+| P2 | Conversation summarization (auto-compact) | L | Context tracking | ⚪ Pending |
+| P2 | Custom system prompts per session | M | - | ⚪ Pending |
+| P2 | Model-specific prompt templates | M | - | ⚪ Pending |
+| P3 | Token cost estimation display | S | Context tracking | ⚪ Pending |
+| P3 | Response caching (same prompt = cached) | M | - | ⚪ Pending |
 
-### Dependencies
-- Phase 1 (stability first)
+### Success Criteria
+- [ ] All 4 providers support streaming
+- [ ] Token count visible in UI
+- [ ] Context auto-summarizes at 80% capacity
+
+### Technical Notes
+- Anthropic SDK supports streaming via `WithStreaming()`
+- OpenAI SDK supports streaming via `CreateChatCompletionStream()`
+- Context window: Ollama varies, Gemini 1M, Claude 200K, GPT-4 128K
 
 ---
 
 ## Phase 3: Agent Mode v2
 
-Priority: MEDIUM | Status: Planned
+> **Goal:** More powerful autonomous task execution
 
-- [ ] Parallel task execution
-- [ ] Task dependency graph
-- [ ] Rollback on failure
-- [ ] Custom verification scripts
-- [ ] Plan templates / saved workflows
-- [ ] Agent memory across sessions
+| Priority | Task | Effort | Depends On | Status |
+|----------|------|--------|------------|--------|
+| P1 | Task dependency graph (DAG) | L | Phase 1 | ⚪ Pending |
+| P1 | Parallel task execution | L | DAG | ⚪ Pending |
+| P2 | Rollback on failure (undo last N tasks) | L | - | ⚪ Pending |
+| P2 | Plan templates (save/load workflows) | M | - | ⚪ Pending |
+| P2 | Custom verification scripts | M | - | ⚪ Pending |
+| P3 | Agent memory (learn from past sessions) | XL | - | ⚪ Pending |
+| P3 | Natural language plan editing | L | - | ⚪ Pending |
 
-### Dependencies
-- Phase 2 (AI enhancements)
+### Success Criteria
+- [ ] Can run 3 independent tasks in parallel
+- [ ] Failed task triggers rollback prompt
+- [ ] User can save plan as reusable template
 
----
-
-## Phase 4: Collaboration v2
-
-Priority: LOW | Status: Planned
-
-- [ ] Public signaling server
-- [ ] Room persistence
-- [ ] File sharing
-- [ ] Screen sharing mode
-- [ ] Voice chat integration (optional)
-- [ ] Permission levels (view-only, suggest, full)
-
-### Dependencies
-- Phase 1 (stability)
+### Technical Design
+```
+Plan DAG Example:
+  task-1 (init) ──┬── task-2 (build) ──┬── task-4 (deploy)
+                  └── task-3 (test) ───┘
+```
 
 ---
 
-## Phase 5: Plugin Ecosystem
+## Phase 4: Distribution
 
-Priority: LOW | Status: Planned
+> **Goal:** Easy installation on all platforms
 
-- [ ] Plugin marketplace / registry
-- [ ] Plugin SDK with examples
-- [ ] Lua/JavaScript plugin support
-- [ ] Plugin configuration UI
-- [ ] Plugin auto-update
+| Priority | Task | Effort | Depends On | Status |
+|----------|------|--------|------------|--------|
+| P1 | GitHub releases with goreleaser | M | Phase 1 | ⚪ Pending |
+| P1 | Homebrew formula (macOS/Linux) | S | goreleaser | ⚪ Pending |
+| P2 | Chocolatey package (Windows) | M | goreleaser | ⚪ Pending |
+| P2 | Docker image | S | goreleaser | ⚪ Pending |
+| P2 | APT repository (Debian/Ubuntu) | M | goreleaser | ⚪ Pending |
+| P3 | AUR package (Arch Linux) | S | goreleaser | ⚪ Pending |
+| P3 | Auto-update mechanism | L | - | ⚪ Pending |
 
-### Dependencies
-- Phase 1 (stability)
+### Success Criteria
+- [ ] `brew install terminalizcrazy` works
+- [ ] `choco install terminalizcrazy` works
+- [ ] `docker run terminalizcrazy` works
+- [ ] GitHub release has binaries for all platforms
+
+### goreleaser Config
+```yaml
+# Already partially configured in .goreleaser.yaml
+builds:
+  - goos: [linux, darwin, windows]
+    goarch: [amd64, arm64]
+```
 
 ---
 
-## Phase 6: Distribution
+## Phase 5: Collaboration v2
 
-Priority: MEDIUM | Status: Planned
+> **Goal:** Production-ready collaboration features
 
-- [ ] Homebrew formula
-- [ ] APT/YUM packages
-- [ ] Chocolatey package
-- [ ] Docker image
-- [ ] GitHub releases with goreleaser
-- [ ] Auto-update mechanism
+| Priority | Task | Effort | Depends On | Status |
+|----------|------|--------|------------|--------|
+| P2 | Public signaling server | L | Phase 1 | ⚪ Pending |
+| P2 | Permission levels (view/suggest/full) | M | - | ⚪ Pending |
+| P2 | Room persistence (rejoin after disconnect) | M | - | ⚪ Pending |
+| P3 | File sharing in session | L | - | ⚪ Pending |
+| P3 | Increase max users (5 → 10) | S | - | ⚪ Pending |
+| P3 | Session recording | L | - | ⚪ Pending |
 
-### Dependencies
-- Phase 1 (stability)
+### Success Criteria
+- [ ] Users can reconnect to same room after network drop
+- [ ] View-only users cannot execute commands
+- [ ] Public server handles 100 concurrent rooms
 
 ---
 
-## Backlog (Unprioritized)
+## Phase 6: Plugin Ecosystem
 
-- [ ] GPU acceleration for rendering
-- [ ] SSH session support
-- [ ] tmux integration
-- [ ] Vim keybinding mode
-- [ ] Custom keybinding configuration
-- [ ] Session recording/playback
-- [ ] Export session to HTML/Markdown
-- [ ] Mobile companion app (view-only)
-- [ ] VS Code extension integration
-- [ ] MCP (Model Context Protocol) support
+> **Goal:** Third-party plugin support
+
+| Priority | Task | Effort | Depends On | Status |
+|----------|------|--------|------------|--------|
+| P2 | Plugin SDK documentation | M | Phase 1 | ⚪ Pending |
+| P2 | Example plugins (3-5 examples) | M | SDK docs | ⚪ Pending |
+| P3 | Plugin manifest.yaml schema | S | - | ⚪ Pending |
+| P3 | Plugin enable/disable UI | M | - | ⚪ Pending |
+| P3 | Plugin marketplace (registry) | XL | - | ⚪ Pending |
+| P3 | Lua plugin runtime | XL | - | ⚪ Pending |
+
+### Success Criteria
+- [ ] Developer can create plugin following docs
+- [ ] Plugin can be installed from URL
+- [ ] Plugin config editable without code changes
+
+---
+
+## Backlog (Prioritized)
+
+### Must Have (P1-P2) - Next 3 Months
+| Task | Effort | Rationale |
+|------|--------|-----------|
+| MCP (Model Context Protocol) support | L | Industry standard for AI tools |
+| SSH session support | L | Remote server management |
+| Custom keybinding configuration | M | Power user request |
+| Export session to Markdown | S | Documentation use case |
+
+### Should Have (P2-P3) - Next 6 Months
+| Task | Effort | Rationale |
+|------|--------|-----------|
+| Vim keybinding mode | M | Developer preference |
+| tmux integration | M | Workflow integration |
+| Session recording/playback | L | Training/demo use case |
+| VS Code extension | L | IDE integration |
+
+### Could Have (P3) - Future
+| Task | Effort | Rationale |
+|------|--------|-----------|
+| GPU acceleration for rendering | XL | Performance edge case |
+| Mobile companion app | XL | View-only monitoring |
+| Voice chat integration | XL | Nice-to-have |
+| High contrast themes | S | Accessibility |
+
+### Won't Have (Descoped)
+| Task | Reason |
+|------|--------|
+| Browser-based version | Focus on native terminal |
+| Windows CMD support | Too limited, use Windows Terminal |
+
+---
+
+## Sprint Planning Template
+
+### Sprint N (2 weeks)
+
+**Goal:** [One sentence goal]
+
+**Capacity:** [X story points / Y hours]
+
+| Task | Priority | Effort | Assignee |
+|------|----------|--------|----------|
+| Task 1 | P0 | S | - |
+| Task 2 | P1 | M | - |
+| Task 3 | P1 | M | - |
+
+**Definition of Done:**
+- [ ] Code complete
+- [ ] Tests passing (80%+ coverage)
+- [ ] Documentation updated
+- [ ] PR reviewed and merged
+
+---
+
+## Milestones
+
+| Milestone | Target | Key Deliverables |
+|-----------|--------|------------------|
+| v0.9.0 | Phase 1 complete | 80% coverage, CI green |
+| v1.0.0 | Phase 2 + 4 complete | Full streaming, GitHub releases |
+| v1.1.0 | Phase 3 complete | Agent v2 with parallel tasks |
+| v1.2.0 | Phase 5 + 6 complete | Plugin ecosystem, collab v2 |
+
+---
+
+## Decision Log
+
+| Date | Decision | Rationale |
+|------|----------|-----------|
+| 2026-04 | Default to Ollama | Local-first, no API key friction |
+| 2026-04 | SQLite for storage | Embedded, zero-config |
+| 2026-04 | Bubble Tea for TUI | Best Go TUI framework |
 
 ---
 
@@ -140,12 +287,13 @@ Priority: MEDIUM | Status: Planned
 - TDD for new features
 
 ### Testing Strategy
-- Unit tests per package
+- Unit tests per package (target: 80%)
 - Integration tests for AI/storage
-- E2E tests for user flows
-- Race detection in CI
+- E2E tests for critical user flows
+- Race detection in CI (`go test -race`)
 
 ### Release Cadence
-- Semantic versioning
-- Changelog generation
-- GitHub releases
+- Semantic versioning (MAJOR.MINOR.PATCH)
+- Changelog generation (keep-a-changelog format)
+- GitHub releases with release notes
+- Pre-release tags for testing (v1.0.0-rc.1)
