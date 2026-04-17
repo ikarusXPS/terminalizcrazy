@@ -1,112 +1,112 @@
-# TerminalizCrazy Dokumentation
+# TerminalizCrazy Documentation
 
-> KI-gestütztes Terminal für intelligente Befehlsausführung
+> AI-powered terminal for intelligent command execution
 
 ```
 +-------------------------------------------------------------+
 |  TerminalizCrazy v0.1.0   ollama/gemma4   [session]         |
 +-------------------------------------------------------------+
-|  KI-native Terminal mit Agent Mode, Collaboration,          |
-|  SecretGuard und Multi-Provider Support                     |
+|  AI-native terminal with Agent Mode, Collaboration,         |
+|  SecretGuard and Multi-Provider Support                     |
 +-------------------------------------------------------------+
 ```
 
-## Schnellnavigation
+## Quick Navigation
 
-### Erste Schritte
+### Getting Started
 
-| Dokument | Beschreibung |
-|----------|--------------|
-| [Installation](erste-schritte/installation.md) | System-Anforderungen und Installation |
-| [Schnellstart](erste-schritte/schnellstart.md) | In 5 Minuten loslegen |
-| [Tutorial](erste-schritte/tutorial.md) | Interaktives Tutorial (~12 Minuten) |
+| Document | Description |
+|----------|-------------|
+| [Installation](erste-schritte/installation.md) | System requirements and installation |
+| [Quick Start](erste-schritte/schnellstart.md) | Get started in 5 minutes |
+| [Tutorial](erste-schritte/tutorial.md) | Interactive tutorial (~12 minutes) |
 
-### Anleitungen
+### Guides
 
-| Dokument | Beschreibung |
-|----------|--------------|
-| [AI-Integration](anleitungen/ai-integration.md) | KI-Features optimal nutzen |
-| [Agent-Modus](anleitungen/agent-modus.md) | Komplexe Aufgaben automatisieren |
-| [Zusammenarbeit](anleitungen/zusammenarbeit.md) | Sessions mit anderen teilen |
-| [Workflows](anleitungen/workflows.md) | Wiederkehrende Aufgaben speichern |
-| [Plugins](anleitungen/plugins.md) | Eigene Plugins entwickeln |
+| Document | Description |
+|----------|-------------|
+| [AI Integration](anleitungen/ai-integration.md) | Use AI features optimally |
+| [Agent Mode](anleitungen/agent-modus.md) | Automate complex tasks |
+| [Collaboration](anleitungen/zusammenarbeit.md) | Share sessions with others |
+| [Workflows](anleitungen/workflows.md) | Save recurring tasks |
+| [Plugins](anleitungen/plugins.md) | Develop your own plugins |
 
-### Referenz
+### Reference
 
-| Dokument | Beschreibung |
-|----------|--------------|
-| [Einstellungen](referenz/einstellungen.md) | Alle 40+ Konfigurationsoptionen |
-| [Tastenkürzel](referenz/tastenkuerzel.md) | Vollständige Tastenbelegung |
-| [Themes](referenz/themes.md) | Theme-Anpassung und -Erstellung |
-| [Risikostufen](referenz/risikostufen.md) | Befehlssicherheit verstehen |
+| Document | Description |
+|----------|-------------|
+| [Settings](referenz/einstellungen.md) | All 40+ configuration options |
+| [Keyboard Shortcuts](referenz/tastenkuerzel.md) | Complete key bindings |
+| [Themes](referenz/themes.md) | Theme customization and creation |
+| [Risk Levels](referenz/risikostufen.md) | Understanding command safety |
 
-### Konzepte
+### Concepts
 
-| Dokument | Beschreibung |
-|----------|--------------|
-| [Architektur](konzepte/architektur.md) | System-Übersicht |
-| [Secret Guard](konzepte/secret-guard.md) | Automatische Geheimnismaskierung |
-| [Projekt-Erkennung](konzepte/projekt-erkennung.md) | Intelligente Projektanalyse |
+| Document | Description |
+|----------|-------------|
+| [Architecture](konzepte/architektur.md) | System overview |
+| [Secret Guard](konzepte/secret-guard.md) | Automatic secret masking |
+| [Project Detection](konzepte/projekt-erkennung.md) | Intelligent project analysis |
 
 ---
 
-## Was ist TerminalizCrazy?
+## What is TerminalizCrazy?
 
-TerminalizCrazy ist ein **KI-natives Terminal**, das natürliche Sprache in Terminal-Befehle übersetzt. Anstatt sich komplizierte Befehlssyntax zu merken, beschreiben Sie einfach, was Sie tun möchten.
+TerminalizCrazy is an **AI-native terminal** that translates natural language into terminal commands. Instead of memorizing complex command syntax, simply describe what you want to do.
 
-### Hauptfunktionen
+### Key Features
 
-- **Multi-Provider Support** - Ollama/Gemma4 (Standard), Gemini, Claude, GPT
-- **Agent-Modus** - Automatische Planung und Ausführung komplexer Aufgaben (Ctrl+A)
-- **Live Model-Wechsel** - KI-Modell ohne Neustart wechseln (Ctrl+M)
-- **Risikobewertung** - Warnung vor gefährlichen Befehlen (4 Stufen)
-- **Secret Guard** - Automatische Maskierung von 7 Secret-Typen
-- **Multi-Pane Layouts** - Horizontale/vertikale Splits, 5 Layout-Presets
-- **Session-Persistenz** - Alle Gespräche werden gespeichert
-- **Projekt-Erkennung** - 11 Projekttypen mit Framework-Erkennung
-- **Zusammenarbeit** - E2E-verschlüsselte Sessions in Echtzeit teilen
+- **Multi-Provider Support** - Ollama/Gemma4 (default), Gemini, Claude, GPT
+- **Agent Mode** - Automatic planning and execution of complex tasks (Ctrl+A)
+- **Live Model Switching** - Change AI model without restart (Ctrl+M)
+- **Risk Assessment** - Warning for dangerous commands (4 levels)
+- **Secret Guard** - Automatic masking of 7 secret types
+- **Multi-Pane Layouts** - Horizontal/vertical splits, 5 layout presets
+- **Session Persistence** - All conversations are saved
+- **Project Detection** - 11 project types with framework detection
+- **Collaboration** - Share E2E-encrypted sessions in real-time
 
-### Beispiel
+### Example
 
 ```
-Sie: "zeige mir die größten dateien in diesem ordner"
+You: "show me the largest files in this folder"
 
-TerminalizCrazy: Hier ist der Befehl:
+TerminalizCrazy: Here is the command:
   du -ah . | sort -rh | head -20
 
-  Drücken Sie Ctrl+E zum Ausführen
+  Press Ctrl+E to execute
 ```
 
 ---
 
-## Schnellstart
+## Quick Start
 
 ```bash
-# 1. Ollama mit Gemma4 starten (Standard, lokal)
+# 1. Start Ollama with Gemma4 (default, local)
 ollama pull gemma4
 ollama serve
 
-# Oder Cloud-Provider:
+# Or cloud provider:
 # export GEMINI_API_KEY="AIzaSy..." && export AI_PROVIDER="gemini"
 
-# 2. Starten
+# 2. Start
 terminalizcrazy
 
-# 3. Fragen stellen
-> wie erstelle ich ein neues git repository?
+# 3. Ask questions
+> how do I create a new git repository?
 ```
 
-Weitere Details: [Schnellstart-Anleitung](erste-schritte/schnellstart.md)
+More details: [Quick Start Guide](erste-schritte/schnellstart.md)
 
 ---
 
-## Konfiguration
+## Configuration
 
-TerminalizCrazy wird über `~/.terminalizcrazy/config.toml` konfiguriert.
+TerminalizCrazy is configured via `~/.terminalizcrazy/config.toml`.
 
-Vollständige Beispielkonfiguration: [`config.toml.example`](../config.toml.example)
+Full example configuration: [`config.toml.example`](../config.toml.example)
 
-Detaillierte Dokumentation: [Einstellungen](referenz/einstellungen.md)
+Detailed documentation: [Settings](referenz/einstellungen.md)
 
 ---
 
@@ -117,4 +117,4 @@ Detaillierte Dokumentation: [Einstellungen](referenz/einstellungen.md)
 
 ---
 
-*Erstellt mit TerminalizCrazy*
+*Created with TerminalizCrazy*

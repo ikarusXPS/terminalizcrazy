@@ -1,73 +1,73 @@
-# Schnellstart
+# Quick Start
 
-> In 5 Minuten loslegen
+> Get started in 5 minutes
 
 ```
 +-------------------------------------------------------------+
 |  TerminalizCrazy v0.1.0   ollama/gemma4   [session-id]      |
 +-------------------------------------------------------------+
 |                                                             |
-|  Willkommen! Stellen Sie Ihre erste Frage...                |
+|  Welcome! Ask your first question...                        |
 |                                                             |
 +-------------------------------------------------------------+
 | > _                                                         |
 +-------------------------------------------------------------+
-| Enter: Senden | Ctrl+E: Ausfuehren | Esc: Beenden           |
+| Enter: Send | Ctrl+E: Execute | Esc: Quit                   |
 +-------------------------------------------------------------+
 ```
 
-## Voraussetzungen
+## Prerequisites
 
-- TerminalizCrazy installiert (siehe [Installation](installation.md))
-- Ollama mit Gemma4 (Standard) oder Cloud-Provider konfiguriert
+- TerminalizCrazy installed (see [Installation](installation.md))
+- Ollama with Gemma4 (default) or cloud provider configured
 
 ---
 
-## 1. Starten
+## 1. Start
 
-Oeffnen Sie ein Terminal und starten Sie TerminalizCrazy:
+Open a terminal and start TerminalizCrazy:
 
     terminalizcrazy
 
-Sie sollten sehen:
-- Header mit Version und KI-Status (gruen = verbunden)
-- Eingabefeld am unteren Rand
+You should see:
+- Header with version and AI status (green = connected)
+- Input field at the bottom
 
 ---
 
-## 2. Erste Anfrage
+## 2. First Request
 
-Geben Sie eine Frage in natuerlicher Sprache ein:
+Enter a question in natural language:
 
-    > Wie finde ich die groessten Dateien in diesem Ordner?
+    > How do I find the largest files in this folder?
 
 ```
 +-------------------------------------------------------------+
-|  You: Wie finde ich die groessten Dateien?                  |
+|  You: How do I find the largest files?                      |
 |                                                             |
-|  AI: Hier ist der passende Befehl:                          |
+|  AI: Here is the appropriate command:                       |
 |                                                             |
 |     find . -type f -exec du -h {} + | sort -rh | head -20   |
 |                                                             |
-|     Dieser Befehl findet alle Dateien, sortiert sie nach    |
-|     Groesse und zeigt die 20 groessten an.                  |
+|     This command finds all files, sorts them by size,       |
+|     and shows the 20 largest.                               |
 |                                                             |
 |  Press Ctrl+E to execute                                    |
 +-------------------------------------------------------------+
 ```
 
-TerminalizCrazy antwortet mit:
-- Dem passenden Terminal-Befehl
-- Einer kurzen Erklaerung
-- Hinweis: "Press Ctrl+E to execute"
+TerminalizCrazy responds with:
+- The appropriate terminal command
+- A brief explanation
+- Hint: "Press Ctrl+E to execute"
 
 ---
 
-## 3. Befehl ausfuehren
+## 3. Execute Command
 
-Druecken Sie **Ctrl+E** um den vorgeschlagenen Befehl auszufuehren.
+Press **Ctrl+E** to execute the suggested command.
 
-Bei riskanten Befehlen erscheint eine Bestaetigung:
+For risky commands, a confirmation appears:
 
 ```
 +-------------------------------------------------------------+
@@ -79,111 +79,111 @@ Bei riskanten Befehlen erscheint eine Bestaetigung:
 +-------------------------------------------------------------+
 ```
 
-- Druecken Sie **Y** fuer Ja
-- Druecken Sie **N** fuer Nein
+- Press **Y** for Yes
+- Press **N** for No
 
-Das Ergebnis wird im Chat angezeigt.
-
----
-
-## 4. Befehl kopieren
-
-Druecken Sie **Ctrl+Y** um den letzten Befehl ins Clipboard zu kopieren.
-
-Nuetzlich, wenn Sie den Befehl anpassen oder in einem anderen Terminal verwenden moechten.
+The result is displayed in the chat.
 
 ---
 
-## 5. Historie durchsuchen
+## 4. Copy Command
 
-Druecken Sie die **Pfeiltaste nach oben** um vorherige Eingaben durchzublaettern.
+Press **Ctrl+Y** to copy the last command to the clipboard.
 
-Die Historie bleibt ueber Sessions hinweg erhalten.
-
----
-
-## Wichtige Tastenkuerzel
-
-| Taste | Aktion |
-|-------|--------|
-| Enter | Nachricht senden |
-| Ctrl+E | Letzten Befehl ausfuehren |
-| Ctrl+Y | Befehl kopieren |
-| Ctrl+L | Chat leeren |
-| Pfeil hoch/runter | Historie durchsuchen |
-| Esc | Beenden |
-
-Vollstaendige Liste: [Tastenkuerzel](../referenz/tastenkuerzel.md)
+Useful when you want to modify the command or use it in another terminal.
 
 ---
 
-## Beispiele
+## 5. Browse History
 
-### Dateiverwaltung
+Press the **Up arrow** to browse through previous inputs.
 
-    > Zeige alle Dateien groesser als 100MB
-    > Loesche alle .tmp Dateien
-    > Finde doppelte Dateien
+History is preserved across sessions.
+
+---
+
+## Important Keyboard Shortcuts
+
+| Key | Action |
+|-----|--------|
+| Enter | Send message |
+| Ctrl+E | Execute last command |
+| Ctrl+Y | Copy command |
+| Ctrl+L | Clear chat |
+| Up/Down arrows | Browse history |
+| Esc | Quit |
+
+Full list: [Keyboard Shortcuts](../referenz/tastenkuerzel.md)
+
+---
+
+## Examples
+
+### File Management
+
+    > Show all files larger than 100MB
+    > Delete all .tmp files
+    > Find duplicate files
 
 ### Git
 
-    > Zeige die letzten 5 Commits
-    > Erstelle einen neuen Branch namens feature/login
-    > Was habe ich heute geaendert?
+    > Show the last 5 commits
+    > Create a new branch called feature/login
+    > What did I change today?
 
-### Systeminformationen
+### System Information
 
-    > Wie viel Speicherplatz ist noch frei?
-    > Welche Prozesse verbrauchen am meisten RAM?
-    > Zeige meine IP-Adresse
+    > How much disk space is left?
+    > Which processes are using the most RAM?
+    > Show my IP address
 
-### Entwicklung
+### Development
 
-    > Installiere alle npm Dependencies
-    > Fuehre die Tests aus
-    > Starte den Development Server
+    > Install all npm dependencies
+    > Run the tests
+    > Start the development server
 
 ---
 
 ## Sessions
 
-TerminalizCrazy speichert Ihre Gespraeche automatisch.
+TerminalizCrazy saves your conversations automatically.
 
-Beim naechsten Start koennen Sie:
-1. Eine bestehende Session fortsetzen
-2. Eine neue Session starten
+On the next start you can:
+1. Continue an existing session
+2. Start a new session
 
-Sessions werden nach Projekt organisiert (basierend auf Ihrem Arbeitsverzeichnis).
-
----
-
-## Zusammenarbeit
-
-Teilen Sie Ihre Session mit anderen:
-
-```
-+-------------------------------------------------------------+
-|  Session teilen                                             |
-|                                                             |
-|  Share-Code: ABCD-1234                                      |
-|                                                             |
-|  Teilen Sie diesen Code mit anderen Teilnehmern.            |
-|  Sie koennen mit Ctrl+J beitreten.                          |
-|                                                             |
-|  [Verbunden: 2 Teilnehmer]                                  |
-+-------------------------------------------------------------+
-```
-
-1. Druecken Sie **Ctrl+S** um zu teilen
-2. Ein Share-Code wird angezeigt (z.B. ABCD-1234)
-3. Andere druecken **Ctrl+J** und geben den Code ein
-
-Beide sehen alle Nachrichten und Befehle in Echtzeit (E2E-verschluesselt).
+Sessions are organized by project (based on your working directory).
 
 ---
 
-## Naechste Schritte
+## Collaboration
 
-- [Tutorial](tutorial.md) - Ausfuehrliches interaktives Tutorial
-- [Agent-Modus](../anleitungen/agent-modus.md) - Komplexe Aufgaben automatisieren
-- [Einstellungen](../referenz/einstellungen.md) - Anpassungsmoeglichkeiten
+Share your session with others:
+
+```
++-------------------------------------------------------------+
+|  Share Session                                              |
+|                                                             |
+|  Share Code: ABCD-1234                                      |
+|                                                             |
+|  Share this code with other participants.                   |
+|  They can join with Ctrl+J.                                 |
+|                                                             |
+|  [Connected: 2 participants]                                |
++-------------------------------------------------------------+
+```
+
+1. Press **Ctrl+S** to share
+2. A share code is displayed (e.g., ABCD-1234)
+3. Others press **Ctrl+J** and enter the code
+
+Both see all messages and commands in real-time (E2E encrypted).
+
+---
+
+## Next Steps
+
+- [Tutorial](tutorial.md) - Detailed interactive tutorial
+- [Agent Mode](../anleitungen/agent-modus.md) - Automate complex tasks
+- [Settings](../referenz/einstellungen.md) - Customization options

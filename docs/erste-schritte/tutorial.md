@@ -1,47 +1,47 @@
-# Interaktives Tutorial
+# Interactive Tutorial
 
-> Schritt-fuer-Schritt Einfuehrung in TerminalizCrazy (~12 Minuten)
+> Step-by-step introduction to TerminalizCrazy (~12 minutes)
 
-## Inhaltsverzeichnis
+## Table of Contents
 
-| Schritt | Thema | Dauer |
-|---------|-------|-------|
-| 1 | [Installation pruefen](#schritt-1-installation-pruefen) | 2 min |
-| 2 | [Erster Start](#schritt-2-erster-start) | 1 min |
-| 3 | [Erste Frage stellen](#schritt-3-erste-frage-stellen) | 2 min |
-| 4 | [Befehl ausfuehren](#schritt-4-befehl-ausfuehren) | 1 min |
-| 5 | [Multi-Pane nutzen](#schritt-5-multi-pane-nutzen) | 2 min |
-| 6 | [Agent Mode ausprobieren](#schritt-6-agent-mode-ausprobieren) | 3 min |
-| 7 | [Theme wechseln](#schritt-7-theme-wechseln) | 1 min |
+| Step | Topic | Duration |
+| ---- | ----- | -------- |
+| 1 | [Check Installation](#step-1-check-installation) | 2 min |
+| 2 | [First Launch](#step-2-first-launch) | 1 min |
+| 3 | [Ask Your First Question](#step-3-ask-your-first-question) | 2 min |
+| 4 | [Execute a Command](#step-4-execute-a-command) | 1 min |
+| 5 | [Using Multi-Pane](#step-5-using-multi-pane) | 2 min |
+| 6 | [Try Agent Mode](#step-6-try-agent-mode) | 3 min |
+| 7 | [Change Theme](#step-7-change-theme) | 1 min |
 
-## Lernziele
+## Learning Goals
 
-Nach diesem Tutorial werden Sie:
+After this tutorial you will be able to:
 
-- KI-Befehlsvorschlaege verstehen und nutzen
-- Befehle sicher ausfuehren koennen
-- Multi-Pane Layouts effektiv einsetzen
-- Den Agent-Modus fuer komplexe Aufgaben nutzen
-- Sessions teilen und wiederherstellen
-- Themes anpassen
+- Understand and use AI command suggestions
+- Execute commands safely
+- Use multi-pane layouts effectively
+- Use Agent mode for complex tasks
+- Share and restore sessions
+- Customize themes
 
 ---
 
-## Schritt 1: Installation pruefen
+## Step 1: Check Installation
 
-Pruefen Sie, ob TerminalizCrazy korrekt installiert ist:
+Verify that TerminalizCrazy is correctly installed:
 
 ```bash
-# Ollama pruefen (Standard-Provider)
+# Check Ollama (default provider)
 ollama list
 
-# Gemma4 sollte angezeigt werden
-# Falls nicht:
+# Gemma4 should be listed
+# If not:
 ollama pull gemma4
 ollama serve
 ```
 
-Fuer Cloud-Provider (optional):
+For cloud providers (optional):
 
 ```bash
 # Gemini
@@ -50,73 +50,76 @@ export GEMINI_API_KEY="AIzaSy..." && export AI_PROVIDER="gemini"
 
 ---
 
-## Schritt 2: Erster Start
+## Step 2: First Launch
 
-Starten Sie TerminalizCrazy:
+Start TerminalizCrazy:
 
 ```bash
 terminalizcrazy
 ```
 
-```
+```plaintext
 +-------------------------------------------------------------+
 |  TerminalizCrazy v0.1.0   ollama/gemma4   [abc123]          |
 +-------------------------------------------------------------+
 |                                                             |
-|  Willkommen bei TerminalizCrazy!                            |
-|  Stellen Sie eine Frage in natuerlicher Sprache.            |
+|  Welcome to TerminalizCrazy!                                |
+|  Ask a question in natural language.                        |
 |                                                             |
 +-------------------------------------------------------------+
 | > _                                                         |
 +-------------------------------------------------------------+
-| Enter: Senden | Ctrl+E: Ausfuehren | Ctrl+Y: Kopieren       |
+| Enter: Send | Ctrl+E: Execute | Ctrl+Y: Copy                |
 +-------------------------------------------------------------+
 ```
 
-Sie sehen:
-- Den Header mit Projektname und Version
-- KI-Provider und Status (ollama/gemma4 = verbunden)
-- Session-ID in eckigen Klammern
-- Eingabefeld am unteren Rand
+You will see:
 
-Hilfreiche Tastenkuerzel werden in der Fusszeile angezeigt.
+- Header with project name and version
+- AI provider and status (ollama/gemma4 = connected)
+- Session ID in square brackets
+- Input field at the bottom
+
+Helpful keyboard shortcuts are shown in the footer.
 
 ---
 
-## Schritt 3: Erste Frage stellen
+## Step 3: Ask Your First Question
 
-Stellen Sie Ihre erste Frage. Tippen Sie:
+Ask your first question. Type:
 
-    list files
-
-Druecken Sie **Enter**.
-
+```plaintext
+list files
 ```
+
+Press **Enter**.
+
+```plaintext
 +-------------------------------------------------------------+
 |  You: list files                                            |
 |                                                             |
-|  AI: Hier ist der Befehl zum Auflisten von Dateien:         |
+|  AI: Here is the command to list files:                     |
 |                                                             |
 |     ls -la                                                  |
 |                                                             |
-|     -l zeigt Details (Rechte, Groesse, Datum)               |
-|     -a zeigt auch versteckte Dateien                        |
+|     -l shows details (permissions, size, date)              |
+|     -a shows hidden files too                               |
 |                                                             |
 |  Press Ctrl+E to execute                                    |
 +-------------------------------------------------------------+
 ```
 
-Die KI antwortet mit einem passenden Befehl und Erklaerung.
+The AI responds with an appropriate command and explanation.
 
 ---
 
-## Schritt 4: Befehl ausfuehren
+## Step 4: Execute a Command
 
-Druecken Sie **Ctrl+E** um den vorgeschlagenen Befehl auszufuehren.
+Press **Ctrl+E** to execute the suggested command.
 
-Da `ls` ein sicherer Befehl ist (Risikostufe: LOW), wird er sofort ausgefuehrt:
+Since `ls` is a safe command (risk level: LOW), it executes immediately:
 
-```
+```plaintext
 +-------------------------------------------------------------+
 |  $ ls -la                                                   |
 |  total 64                                                   |
@@ -129,21 +132,21 @@ Da `ls` ein sicherer Befehl ist (Risikostufe: LOW), wird er sofort ausgefuehrt:
 +-------------------------------------------------------------+
 ```
 
-Das Ergebnis erscheint im Chat mit Exit-Code.
+The result appears in the chat with the exit code.
 
 ---
 
-## Schritt 5: Multi-Pane nutzen
+## Step 5: Using Multi-Pane
 
-TerminalizCrazy unterstuetzt mehrere Panes gleichzeitig.
+TerminalizCrazy supports multiple panes simultaneously.
 
-### Pane teilen
+### Split Pane
 
-Druecken Sie **Ctrl+\\** fuer einen vertikalen Split:
+Press **Ctrl+\\** for a vertical split:
 
-```
+```plaintext
 +-------------------------+-------------------------+
-|  Chat                   |  Neuer Pane             |
+|  Chat                   |  New Pane               |
 +-------------------------+-------------------------+
 | You: list files         |                         |
 |                         | > _                     |
@@ -151,48 +154,49 @@ Druecken Sie **Ctrl+\\** fuer einen vertikalen Split:
 +-------------------------+-------------------------+
 ```
 
-Oder **Ctrl+-** fuer einen horizontalen Split.
+Or **Ctrl+-** for a horizontal split.
 
-### Zwischen Panes wechseln
+### Navigate Between Panes
 
-- **Alt+Pfeiltasten**: Navigieren zwischen Panes
-- **Ctrl+Z**: Pane zoomen (Vollbild)
-- **Ctrl+W**: Aktuellen Pane schliessen
+- **Alt+Arrow keys**: Navigate between panes
+- **Ctrl+Z**: Zoom pane (fullscreen)
+- **Ctrl+W**: Close current pane
 
-### Layout-Presets
+### Layout Presets
 
-Starten Sie mit einem vorgefertigten Layout:
+Start with a predefined layout:
 
 ```bash
-terminalizcrazy --layout quad     # 4 Panes
-terminalizcrazy --layout tall     # 2 Panes vertikal
-terminalizcrazy --layout wide     # 2 Panes horizontal
+terminalizcrazy --layout quad     # 4 panes
+terminalizcrazy --layout tall     # 2 panes vertical
+terminalizcrazy --layout wide     # 2 panes horizontal
 ```
 
 ---
 
-## Schritt 6: Agent Mode ausprobieren
+## Step 6: Try Agent Mode
 
-Der Agent Mode plant und fuehrt komplexe Aufgaben automatisch aus.
+Agent Mode plans and executes complex tasks automatically.
 
-### Agent Mode aktivieren
+### Activate Agent Mode
 
-Druecken Sie **Ctrl+A** um den Modus zu wechseln:
+Press **Ctrl+A** to cycle through modes:
+
 - `off` -> `suggest` -> `auto` -> `off`
 
-Empfohlen: `suggest` (plant, fragt vor Ausfuehrung)
+Recommended: `suggest` (plans, asks before execution)
 
-### Komplexe Aufgabe stellen
+### Ask a Complex Task
 
-```
+```plaintext
 > Set up a new React project with TypeScript and ESLint
 ```
 
-Der Agent erstellt einen Plan:
+The agent creates a plan:
 
-```
+```plaintext
 +-------------------------------------------------------------+
-| Agent Mode: Plan erstellt                                   |
+| Agent Mode: Plan created                                    |
 +-------------------------------------------------------------+
 |                                                             |
 |  Plan: React TypeScript Setup (3 Tasks)                     |
@@ -211,37 +215,37 @@ Der Agent erstellt einen Plan:
 +-------------------------------------------------------------+
 ```
 
-- **A**: Plan genehmigen und ausfuehren
-- **R**: Plan ablehnen
-- **M**: Einzelne Tasks anpassen
-- **S**: Task ueberspringen
+- **A**: Approve and execute plan
+- **R**: Reject plan
+- **M**: Modify individual tasks
+- **S**: Skip task
 
 ---
 
-## Schritt 7: Theme wechseln
+## Step 7: Change Theme
 
-TerminalizCrazy bietet 5 eingebaute Themes.
+TerminalizCrazy offers 5 built-in themes.
 
-### Theme in config.toml setzen
+### Set Theme in config.toml
 
 ```toml
 # ~/.terminalizcrazy/config.toml
 theme = "dracula"   # default, dracula, monokai, nord, solarized
 ```
 
-### Verfuegbare Themes
+### Available Themes
 
-| Theme | Beschreibung |
-|-------|--------------|
-| `default` | Standard-Farben |
-| `dracula` | Dunkles Theme mit Lila-Akzenten |
-| `monokai` | Klassisches Entwickler-Theme |
-| `nord` | Nordische Farbpalette |
-| `solarized` | Augenfreundliche Farben |
+| Theme | Description |
+| ----- | ----------- |
+| `default` | Default colors |
+| `dracula` | Dark theme with purple accents |
+| `monokai` | Classic developer theme |
+| `nord` | Nordic color palette |
+| `solarized` | Eye-friendly colors |
 
 ### Hot Reload
 
-Themes werden automatisch neu geladen wenn die Datei geaendert wird:
+Themes are automatically reloaded when the file changes:
 
 ```toml
 [appearance]
@@ -250,87 +254,89 @@ theme_hot_reload = true
 
 ---
 
-## Zusammenfassung
+## Summary
 
-Sie haben gelernt:
+You have learned:
 
-### Grundlagen
+### Basics
 
-| Taste | Aktion |
-|-------|--------|
-| Enter | Nachricht senden |
-| Ctrl+E | Befehl ausfuehren |
-| Ctrl+Y | Befehl kopieren |
-| Pfeil hoch/runter | Historie durchsuchen |
-| Esc | Beenden |
+| Key | Action |
+| --- | ------ |
+| Enter | Send message |
+| Ctrl+E | Execute command |
+| Ctrl+Y | Copy command |
+| Up/Down arrows | Browse history |
+| Esc | Quit |
 
 ### Panes & Layouts
 
-| Taste | Aktion |
-|-------|--------|
-| Ctrl+\\ | Vertikaler Split |
-| Ctrl+- | Horizontaler Split |
-| Alt+Pfeiltasten | Zwischen Panes wechseln |
-| Ctrl+Z | Pane zoomen |
-| Ctrl+W | Pane schliessen |
+| Key | Action |
+| --- | ------ |
+| Ctrl+\\ | Vertical split |
+| Ctrl+- | Horizontal split |
+| Alt+Arrow keys | Switch between panes |
+| Ctrl+Z | Zoom pane |
+| Ctrl+W | Close pane |
 
 ### Agent & Collaboration
 
-| Taste | Aktion |
-|-------|--------|
-| Ctrl+A | Agent Mode umschalten |
-| Ctrl+M | Model Selector oeffnen |
-| Ctrl+S | Session teilen |
-| Ctrl+J | Session beitreten |
-| Ctrl+D | Zusammenarbeit beenden |
+| Key | Action |
+| --- | ------ |
+| Ctrl+A | Toggle agent mode |
+| Ctrl+M | Open model selector |
+| Ctrl+S | Share session |
+| Ctrl+J | Join session |
+| Ctrl+D | End collaboration |
 
 ---
 
-## Naechste Schritte
+## Next Steps
 
-Jetzt sind Sie bereit fuer fortgeschrittene Funktionen:
+Now you're ready for advanced features:
 
-- [Agent-Modus](../anleitungen/agent-modus.md) - Komplexe Aufgaben automatisieren
-- [Workflows](../anleitungen/workflows.md) - Wiederkehrende Aufgaben speichern
-- [Zusammenarbeit](../anleitungen/zusammenarbeit.md) - Team-Features
-- [Einstellungen](../referenz/einstellungen.md) - Alle Konfigurationsoptionen
-
----
-
-## Tipps fuer den Alltag
-
-### Praezise Fragen stellen
-
-```
-Schlecht: "mache etwas mit dateien"
-Gut:      "zeige alle Python-Dateien groesser als 1MB"
-```
-
-### Kontext nutzen
-
-TerminalizCrazy erkennt Ihr Projekt automatisch:
-- In einem Git-Repo: Git-spezifische Vorschlaege
-- In einem Node.js-Projekt: npm-Befehle
-- In einem Python-Projekt: pip/python-Befehle
-- In einem Go-Projekt: go-Befehle
-
-### Bei Unsicherheit: Nachfragen
-
-```
-> Was macht der Befehl "tar -xvzf archive.tar.gz"?
-```
-
-Die KI erklaert jeden Teil des Befehls.
-
-### Model wechseln
-
-Druecken Sie **Ctrl+M** um zwischen KI-Modellen zu wechseln:
-- Gemma4 (Standard, lokal via Ollama)
-- Gemma4:e4b (kompaktere Variante)
-- Gemini Flash/Pro (Cloud)
-- Claude (Anthropic, Cloud)
-- GPT-4 (OpenAI, Cloud)
+- [Agent Mode](../anleitungen/agent-modus.md) - Automate complex tasks
+- [Workflows](../anleitungen/workflows.md) - Save recurring tasks
+- [Collaboration](../anleitungen/zusammenarbeit.md) - Team features
+- [Settings](../referenz/einstellungen.md) - All configuration options
 
 ---
 
-*Viel Erfolg mit TerminalizCrazy!*
+## Tips for Daily Use
+
+### Ask Precise Questions
+
+```plaintext
+Bad:  "do something with files"
+Good: "show all Python files larger than 1MB"
+```
+
+### Use Context
+
+TerminalizCrazy automatically detects your project:
+
+- In a Git repo: Git-specific suggestions
+- In a Node.js project: npm commands
+- In a Python project: pip/python commands
+- In a Go project: go commands
+
+### When Uncertain: Ask
+
+```plaintext
+> What does the command "tar -xvzf archive.tar.gz" do?
+```
+
+The AI explains each part of the command.
+
+### Switch Models
+
+Press **Ctrl+M** to switch between AI models:
+
+- Gemma4 (default, local via Ollama)
+- Gemma4:e4b (compact variant)
+- Gemini Flash/Pro (cloud)
+- Claude (Anthropic, cloud)
+- GPT-4 (OpenAI, cloud)
+
+---
+
+*Good luck with TerminalizCrazy!*
