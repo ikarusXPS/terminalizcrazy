@@ -77,6 +77,7 @@ main.go → config.Load() → tui.Run()
 | `internal/project/` | Project type detection (Go, Node, Python, Rust, Java, etc.) |
 | `internal/theme/` | YAML theme system with hot-reload |
 | `internal/workspace/` | Workspace management with layout presets (quad, tall, wide, stack) |
+| `internal/crypto/` | Key management for encrypted API key storage |
 
 ### AI Integration Pattern
 
@@ -87,23 +88,54 @@ type Client interface {
     Provider() Provider
 }
 
-// Optional streaming support
+// Optional streaming support (Gemini, Ollama support this)
 type StreamingClient interface {
     Client
     CompleteStream(ctx context.Context, req *Request, handler func(StreamingResponse)) error
 }
 ```
 
-Providers: `gemini.go` (default), `anthropic.go`, `openai.go`, `ollama.go`
+Providers: `ollama.go` (default), `gemini.go`, `anthropic.go`, `openai.go`
 
-Agent mode (`ai.Agent`) uses `ai.Planner` to create multi-step task plans that can be approved and executed. Plans contain Tasks with verification (exit_code, output_contains, run_command).
+**Request types** (auto-detected from user input):
+- `RequestTypeCommand` - Natural language → shell command
+- `RequestTypeExplain` - Error/command explanation
+- `RequestTypeChat` - General conversation
 
-### TUI Architecture
+**Agent Mode** (`ai.Agent` + `ai.Planner`):
+- Creates multi-step task plans with verification
+- Plans contain Tasks with verification criteria (exit_code, output_contains, run_command)
+- Three modes: `off`, `suggest` (shows plan, waits for approval), `auto` (executes LOW-risk automatically)
 
-Uses Bubble Tea's Elm architecture (Model-Update-View):
-- `tui.Model` - Main state container
+### TUI Message Flow
+
+Uses Bubble Tea's Elm architecture with async message types:
+```go
+// Async operation results (defined in tui.go)
+aiResponseMsg     // AI completion result
+cmdResultMsg      // Command execution result
+streamingChunkMsg // Streaming AI response chunk
+collabMessageMsg  // Collaboration message from WebSocket
+themeChangedMsg   // Hot-reload theme update
+```
+
+Key components:
+- `tui.Model` - Main state container with ViewMode (Chat, SessionSelect, CollabJoin, ModelSelect)
 - `tui.PaneManager` - Multi-pane layout with splits, zoom, floating panes
-- `tui.TabBar` - Tab navigation with keyboard shortcuts
+- `tui.ConfirmState` - Risk confirmation dialog for Medium/High/Critical commands
+
+### Collaboration Architecture
+
+```
+Host: Ctrl+S → startSharing() → collab.Server (port 8765) + collab.CollabClient
+                                      ↓
+                               WebSocket + ECDH key exchange
+                                      ↓
+Guest: Ctrl+J → joinCollab(shareCode) → collab.CollabClient
+```
+
+Message types: `MsgTypeChat`, `MsgTypeCommand`, `MsgTypeOutput`, `MsgTypeJoin`, `MsgTypeLeave`
+Encryption: ECDH for key exchange, AES-256-GCM for message encryption (`internal/collab/crypto.go`)
 
 ### Storage Schema
 
@@ -138,3 +170,11 @@ Hook-based with priority ordering. Built-in plugins:
 | `Ctrl+M` | Model selector (switch AI models) |
 | `Ctrl+S` | Share session (collaboration) |
 | `Ctrl+J` | Join session |
+
+### Adding a New AI Provider
+
+1. Create `internal/ai/{provider}.go` implementing `ai.Client` (and optionally `StreamingClient`)
+2. Add provider constant to `internal/ai/ai.go`
+3. Add case in `ai.NewService()` switch
+4. Add config fields in `internal/config/config.go`
+5. Add UI handling in `tui.NewModel()` and `loadAvailableModels()`
