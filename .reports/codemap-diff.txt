@@ -1,0 +1,45 @@
+Codemap Generation Report
+=========================
+Generated: 2026-04-17
+Status: NEW (no previous version)
+
+Files Created:
+- codemaps/architecture.md (150 lines)
+- codemaps/backend.md (240 lines)
+- codemaps/data.md (504 lines)
+- Total: 894 lines
+
+Source Analysis:
+- 43 Go source files analyzed (excluding tests)
+- 14 packages mapped
+- 3 codemaps generated
+
+Packages by Size (lines):
+1. tui/tui.go         - 1924 lines
+2. storage/storage.go - 1044 lines
+3. tui/pane_manager.go - 676 lines
+4. collab/server.go   - 582 lines
+5. ai/agent.go        - 557 lines
+
+Dependency Graph:
+- tui depends on 10 internal packages (hub)
+- ai depends on executor
+- config depends on crypto
+- workflows depends on executor
+- workspace, plugins, collab - standalone
+
+Data Models Documented:
+- 7 SQLite tables
+- 25+ Go structs
+- 6 enum/constant groups
+
+Change Summary:
+- Previous version: N/A (first generation)
+- Diff percentage: 100% (new)
+- Approval required: No (under 30% change threshold not applicable for new files)
+
+Next Update Trigger:
+- Major package additions
+- New AI providers
+- Schema migrations
+- Dependency graph changes
